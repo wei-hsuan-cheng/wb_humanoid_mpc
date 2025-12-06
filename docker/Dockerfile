@@ -34,12 +34,12 @@ ENV DISPLAY=${DISPLAY} QT_X11_NO_MITSHM=1
 
 # Set up user and workspace
 WORKDIR ${WB_HUMANOID_MPC_DIR}
-RUN mkdir -p ${WB_HUMANOID_MPC_DIR}/src/wb_humanoid_mpc
+RUN mkdir -p ${WB_HUMANOID_MPC_DIR}/src
 
 # Ensure correct UID/GID
 RUN if ! getent group $GROUP_ID > /dev/null; then groupadd --gid $GROUP_ID devgroup; fi && \
     if ! getent passwd $USER_ID > /dev/null; then useradd --uid $USER_ID --gid $GROUP_ID --create-home devuser; fi && \
     chown -R $USER_ID:$GROUP_ID .
 
-# Copy the Makefile and other necessary files
-COPY . ${WB_HUMANOID_MPC_DIR}/src/wb_humanoid_mpc
+# # Copy the Makefile and other necessary files
+# COPY . ${WB_HUMANOID_MPC_DIR}/src/wb_humanoid_mpc

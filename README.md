@@ -89,8 +89,8 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 | PARALLEL_JOBS | Required System RAM |
 |--------------:|--------------------:|
 | 2 (default)   |  16 GiB             | 
-| 4             |  32 GiB              |
-| 6             |  64 GiB              | 
+| 4             |  32 GiB             |
+| 6             |  64 GiB             | 
 
 
 ```bash

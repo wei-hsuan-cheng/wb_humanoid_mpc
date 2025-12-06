@@ -13,15 +13,32 @@ find_package(ament_cmake REQUIRED)
 include(ExternalProject)
 
 # Set the Mujoco version and download details
-set(MUJOCO_VERSION "3.3.4") 
-set(MUJOCO_DOWNLOAD_URL "https://github.com/google-deepmind/mujoco/releases/download/${MUJOCO_VERSION}/mujoco-${MUJOCO_VERSION}-linux-x86_64.tar.gz")
-set(MUJOCO_TARBALL "${CMAKE_BINARY_DIR}/mujoco_prebuilt/src/mujoco-${MUJOCO_VERSION}-linux-x86_64.tar.gz")
+set(MUJOCO_VERSION "3.3.4")
+
+# Pick the correct archive for the build architecture (default to x86_64).
+set(MUJOCO_ARCH "linux-x86_64")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+  set(MUJOCO_ARCH "linux-aarch64")
+endif()
+
+set(MUJOCO_ARCHIVE "mujoco-${MUJOCO_VERSION}-${MUJOCO_ARCH}.tar.gz")
+set(MUJOCO_DOWNLOAD_URL "https://github.com/google-deepmind/mujoco/releases/download/${MUJOCO_VERSION}/${MUJOCO_ARCHIVE}")
+set(MUJOCO_TARBALL "${CMAKE_BINARY_DIR}/mujoco_prebuilt/src/${MUJOCO_ARCHIVE}")
 set(MUJOCO_INSTALL_DIR ${CMAKE_BINARY_DIR}/mujoco) 
+
+set(MUJOCO_URL_HASH "")
+# SHA256 for the official x86_64 archive (kept to preserve integrity checks).
+if(MUJOCO_ARCH STREQUAL "linux-x86_64")
+  set(MUJOCO_URL_HASH "SHA256=ecf1a17459a342badf2b4f32dd4677a6a0e5fd393c5143993eb3e81b8e44609b")
+endif()
+if(MUJOCO_URL_HASH)
+  set(MUJOCO_HASH_ARG URL_HASH ${MUJOCO_URL_HASH})
+endif()
 
 # Add Mujoco as an external project
 ExternalProject_Add(mujoco_prebuilt
     URL ${MUJOCO_DOWNLOAD_URL}
-    URL_HASH SHA256=ecf1a17459a342badf2b4f32dd4677a6a0e5fd393c5143993eb3e81b8e44609b
+    ${MUJOCO_HASH_ARG}
     PREFIX ${CMAKE_BINARY_DIR}/mujoco_prebuilt
     INSTALL_DIR ${MUJOCO_INSTALL_DIR}
     CONFIGURE_COMMAND ""

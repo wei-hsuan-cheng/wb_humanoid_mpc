@@ -59,7 +59,7 @@ PACKAGES ?= $(NMPC_PACKAGES) $(ROBOT_MODEL_PACKAGES) $(RUNTIME_PACKAGES)
 BUILD_TYPE ?= Release
 BUILD_TESTING ?= ON
 BUILD_WITH_NINJA ?= ON
-PARALLEL_JOBS ?= 6
+PARALLEL_JOBS ?= 1
 CPP_VERSION ?= -std=c++20
 
 ############################################################
@@ -215,4 +215,3 @@ run-mpc-tests:
 	source install/setup.bash && \
 	colcon test --event-handlers console_direct+ --return-code-on-test-failure --packages-select humanoid_common_mpc \
 	humanoid_common_mpc_ros2 humanoid_centroidal_mpc humanoid_centroidal_mpc_ros2 humanoid_wb_mpc
-
