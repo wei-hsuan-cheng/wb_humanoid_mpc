@@ -33,15 +33,16 @@ Create a colcon workspace and clone the repository into the src folder:
 
 ```bash
 mkdir -p humanoid_mpc_ws/src && cd humanoid_mpc_ws/src
-git clone https://github.com/1x-technologies/wb-humanoid-mpc.git
+git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git
 ```
 
-Then initialize all submodules using:
+<!-- Then initialize all submodules using:
 
 ```bash
 cd wb-humanoid-mpc
 git submodule update --init --recursive
-```
+``` -->
+
 ### Install Dependencies
 The project supports both Dockerized workspaces (recommended) or a local installation for developing and running the humanoid MPC. 
 
@@ -100,7 +101,7 @@ make build-all
 ```
 
 ## Running the examples
-Once you run the NMPC a window with Rviz will appear for visualization. The first time you start the MPC for a certain robot model the auto differentiation code will be generated which might take up to 5-15 min depending on your system. Once done the robot appears and you can control it via an xbox gamepad or the controls in the terminal. 
+Once you run the NMPC a window with Rviz will appear for visualization. The first time you start the MPC for a certain robot model the auto differentiation code will be generated which might take up to **5-15 min** depending on your system. Once done the robot appears and you can control it via an xbox gamepad or the controls in the terminal. 
 
 On the top level folder run:
 
