@@ -59,12 +59,12 @@ For working in **Visual Studio Code**, we recommend to install the [Dev Containe
 <summary> Build & run Dockerized workspace with bash scripts</summary>
 
 This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:dev` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
-```
+```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./image_build.bash
 ```
 and launching the docker container:
-```
+```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./launch_wb_mpc.bash
 ```
@@ -107,14 +107,20 @@ On the top level folder run:
 
 For the **Centroidal Dynamics MPC**
 
-```
+```bash
+# Dummy sim
 make launch-g1-dummy-sim
+# MuJoCo sim
+make launch-g1-sim
 ```
 
 For the **Whole-Body Dynamics MPC**
 
-```
+```bash
+# Dummy sim
 make launch-wb-g1-dummy-sim
+# MuJoCo sim
+launch-wb-g1-sim
 ```
 
 #### Interactive Robot Control
