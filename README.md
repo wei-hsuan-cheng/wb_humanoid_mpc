@@ -1,6 +1,6 @@
 # Whole-Body Humanoid MPC
 
-**Forked from [`manumerous/wb_humanoid_mpc`](https://github.com/manumerous/wb_humanoid_mpc).**
+**Forked from [`manumerous/wb_humanoid_mpc`](https://github.com/manumerous/wb_humanoid_mpc) with some bugs fixed.**
 
 This repository contains a Whole-Body Nonlinear Model Predictive Controller (NMPC) for humanoid loco-manipulation control. This approach enables to directly optimize through the **full-order torque-level dynamics in realtime** to generate a wide range of humanoid behaviors building up on an [extended & updated version of ocs2](https://github.com/manumerous/ocs2_ros2)
 
@@ -45,15 +45,6 @@ git submodule update --init --recursive
 
 ### Install Dependencies
 The project supports both Dockerized workspaces (recommended) or a local installation for developing and running the humanoid MPC. 
-
-<details>
-<summary>Build & run Dockerized workspace in VS Code</summary>
-
-We provide a [Dockerfile](https://github.com/manumerous/wb_humanoid_mpc/blob/main/docker/Dockerfile) to enable running and devloping the project from a containerized environment. Check out the [devcontainer.json](https://github.com/manumerous/wb_humanoid_mpc/blob/main/.devcontainer/devcontainer.json) for the arguments that must be supplied to the `docker build` and `docker run` commands.
-
-For working in **Visual Studio Code**, we recommend to install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension. Then, with the root of this repository as the root of your VS Code workspace, enter `Ctrl + Shift + P` and select `Dev Containers: Rebuild and Reopen in Container` at the top of the screen. VS Code will then automatically handle calling the `docker build` and `docker run` commands for you and will reopen the window at the root of the containerized workspace. Once this step is completed, you are ready to [build and run the code](https://github.com/manumerous/wb_humanoid_mpc/tree/main?tab=readme-ov-file#building-the-mpc).
-
-</details>
 
 <details>
 <summary> Build & run Dockerized workspace with bash scripts</summary>
