@@ -111,7 +111,7 @@ For the **Whole-Body Dynamics MPC**
 # Dummy sim
 make launch-wb-g1-dummy-sim
 # MuJoCo sim
-launch-wb-g1-sim
+make launch-wb-g1-sim
 ```
 
 #### Interactive Robot Control
