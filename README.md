@@ -114,6 +114,11 @@ make launch-wb-g1-dummy-sim
 make launch-wb-g1-sim
 ```
 
+Run `rviz2`
+```bash
+rviz2 -d <path_to_pkg>/wb_humanoid_mpc/humanoid_nmpc/humanoid_common_mpc_ros2/rviz/humanoid_zoom_in.rviz
+```
+
 #### Interactive Robot Control
 Command a desired base velocity and root link height via **Robot Base Controller GUI** and **XBox Controller Joystick**. For the joystick it is easiest to directly connect via USB. Otherwise you need to install the required bluetooth Xbox controller drivers on your linux system. The GUI application automatically scanns for Joysticks and indicates whether one is connected. 
 
