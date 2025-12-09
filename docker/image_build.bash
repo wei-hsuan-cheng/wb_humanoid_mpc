@@ -23,7 +23,7 @@ GROUP_ID="$(id -g)"
 GIT_USER_NAME="$(git config --global user.name || echo '')"
 GIT_USER_EMAIL="$(git config --global user.email || echo '')"
 
-IMAGE_TAG="wb-humanoid-mpc:dev"
+IMAGE_TAG="wb-humanoid-mpc:jazzy"
 
 docker build \
   --file "${DOCKERFILE}" \

@@ -27,7 +27,7 @@ HOST_WS="$(realpath "${PWD}/../../../src/wb_humanoid_mpc")"
 
 # Run the container, mounting the entire workspace
 docker run -it \
-  --name wb-mpc-dev \
+  --name wb-mpc-jazzy \
   --net host \
   --privileged \
   -u root \
@@ -39,7 +39,7 @@ docker run -it \
   -v "${XAUTH}:${XAUTH}:rw" \
   -v "${HOST_WS}:/root/src/wb_humanoid_mpc:cached" \
   --workdir /wb_humanoid_mpc_ws \
-  wb-humanoid-mpc:dev \
+  wb-humanoid-mpc:jazzy \
   bash
 
 echo "Done."

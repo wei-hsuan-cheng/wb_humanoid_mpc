@@ -33,7 +33,7 @@ Create a colcon workspace and clone the repository into the src folder:
 
 ```bash
 mkdir -p humanoid_mpc_ws/src && cd humanoid_mpc_ws/src
-git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b arm64
+git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b amd64
 ```
 
 <!-- Then initialize all submodules using:
