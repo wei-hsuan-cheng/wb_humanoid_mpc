@@ -62,9 +62,13 @@ class MPCLaunchConfig:
         print("MPC config urdf file path: ", self.urdf_path)
 
         ### RVIZ Config ###
+        # default_rviz_config_path = os.path.join(
+        #     get_package_share_directory("humanoid_common_mpc_ros2"),
+        #     "rviz/humanoid.rviz",
+        # )
         default_rviz_config_path = os.path.join(
             get_package_share_directory("humanoid_common_mpc_ros2"),
-            "rviz/humanoid.rviz",
+            "rviz/humanoid_zoom_in.rviz",
         )
 
         ### Termianl Prefix ###
