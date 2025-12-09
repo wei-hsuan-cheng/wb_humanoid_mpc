@@ -91,6 +91,7 @@ endif
 
 COMMON_COLCON_BUILD_FLAGS ?= \
 	--parallel-workers=${PARALLEL_JOBS} \
+	--executor sequential \
 	${EVENT_HANDLERS} \
 	--symlink-install \
 	--build-base $(build_dir)/build \
@@ -99,14 +100,24 @@ COMMON_COLCON_BUILD_FLAGS ?= \
 ############################################################
 # Define build and test targets
 ############################################################
+# define default-build-package
+# 	cd ${build_dir} && \
+# 	export MAKEFLAGS="-j ${PARALLEL_JOBS} -d" && \
+# 	source ${ros_source_file} && \
+# 	colcon build ${COMMON_COLCON_BUILD_FLAGS} --packages-up-to $(1) \
+# 	--cmake-args ${COMMON_CMAKE_ARGS} $(EXTRA_CMAKE_ARGS) && \
+# 	source $(build_dir)/install/setup.bash
+# endef
+
 define default-build-package
 	cd ${build_dir} && \
-	export MAKEFLAGS="-j ${PARALLEL_JOBS} -d" && \
+	export MAKEFLAGS="-j ${PARALLEL_JOBS} -l ${PARALLEL_JOBS}" CMAKE_BUILD_PARALLEL_LEVEL=${PARALLEL_JOBS} && \
 	source ${ros_source_file} && \
 	colcon build ${COMMON_COLCON_BUILD_FLAGS} --packages-up-to $(1) \
 	--cmake-args ${COMMON_CMAKE_ARGS} $(EXTRA_CMAKE_ARGS) && \
 	source $(build_dir)/install/setup.bash
 endef
+
 
 define default-build-python-package
 	cd ${build_dir} && \
