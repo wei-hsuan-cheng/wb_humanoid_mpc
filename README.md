@@ -49,7 +49,7 @@ The project supports both Dockerized workspaces (recommended) or a local install
 <details>
 <summary> Build & run Dockerized workspace with bash scripts</summary>
 
-This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:dev` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
+This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:jazzy` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
 ```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./image_build.bash
