@@ -87,8 +87,27 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 | 6             |  64 GiB             | 
 
 
+Build all required pkgs:
 ```bash
 make build-all
+```
+
+Build centroidal dynamics MPC:
+```bash
+# OCS2 dependencies (centroidal dynamics)
+colcon build --symlink-install --packages-select \
+    ocs2_core ocs2_mpc ocs2_ddp ocs2_sqp ocs2_robotic_tools ocs2_pinocchio_interface \
+    ocs2_centroidal_model ocs2_ros2_interfaces ocs2_ros2_msgs 
+
+# Dummy sim
+colcon build --symlink-install --packages-select \
+   humanoid_mpc_msgs humanoid_common_mpc humanoid_common_mpc_ros2 \
+   humanoid_centroidal_mpc humanoid_centroidal_mpc_ros2 \
+   remote_control g1_description g1_centroidal_mpc
+
+# MuJoCo sim
+colcon build --symlink-install --packages-select \
+  mujoco_sim_interface robot_core robot_model
 ```
 
 ## Running the examples
