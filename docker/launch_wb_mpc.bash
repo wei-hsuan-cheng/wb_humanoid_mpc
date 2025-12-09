@@ -13,14 +13,17 @@ set -euo pipefail
 xhost +SI:localuser:root
 
 # Generate Xauthority file for X11 forwarding
-XAUTH=/tmp/.docker.xauth
+XAUTH="${HOME}/.docker.xauth"
+
+if [ -d "${XAUTH}" ]; then
+  rm -rf "${XAUTH}"
+fi
 if [ ! -f "${XAUTH}" ]; then
   touch "${XAUTH}"
-  xauth nlist "${DISPLAY}" \
-    | sed -e 's/^..../ffff/' \
-    | xauth -f "${XAUTH}" nmerge -
+  xauth nlist "${DISPLAY}" | sed -e 's/^..../ffff/' | xauth -f "${XAUTH}" nmerge -
   chmod a+r "${XAUTH}"
 fi
+
 
 # ROOT_COLCON_WS 
 HOST_WS="$(realpath "${PWD}/..")"
