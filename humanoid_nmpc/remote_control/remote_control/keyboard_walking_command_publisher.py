@@ -58,6 +58,7 @@ class KeyboardWalkingCommandPublisher(Node):
         self.min_pelvis_height = 0.2
         self.max_pelvis_height = 1.0
         self.delta_pelvis_height = 0.0
+        self.allow_stepping = True  # placeholder flag to avoid AttributeError in logger
 
         # Create a QoS profile with Best Effort reliability
         qos_profile = QoSProfile(
