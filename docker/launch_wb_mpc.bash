@@ -23,7 +23,7 @@ if [ ! -f "${XAUTH}" ]; then
 fi
 
 # ROOT_COLCON_WS 
-HOST_WS="$(realpath "${PWD}/../../../src/wb_humanoid_mpc")"
+HOST_WS="$(realpath "${PWD}/..")"
 
 # Run the container, mounting the entire workspace
 docker run -it \

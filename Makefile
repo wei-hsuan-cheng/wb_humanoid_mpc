@@ -6,7 +6,7 @@ SHELL := /bin/bash
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_path := $(dir $(mkfile_path))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
-build_dir ?= $(abspath $(lastword $(MAKEFILE_LIST))/../../..)
+build_dir ?= $(abspath $(lastword $(MAKEFILE_LIST))/../..)
 
 CCACHE_DIR := $(build_dir)/.ccache
 
