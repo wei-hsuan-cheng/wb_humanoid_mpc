@@ -33,7 +33,7 @@ Create a colcon workspace and clone the repository into the src folder:
 
 ```bash
 mkdir -p humanoid_mpc_ws/src && cd humanoid_mpc_ws/src
-git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b jazzy
+git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b humble
 ```
 
 ### Install Dependencies
@@ -42,7 +42,7 @@ The project supports both Dockerized workspaces (recommended) or a local install
 <details>
 <summary> Build & run Dockerized workspace with bash scripts</summary>
 
-This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:jazzy` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
+This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
 ```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./image_build.bash
@@ -58,8 +58,8 @@ cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 <details>
 <summary>Install Dependencies Locally</summary>
 
-Make sure you have **ros2** installed on your system as e.g specified for jazzy in
-the [installation guide](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html).
+Make sure you have **ros2** installed on your system as e.g specified for humble in
+the [installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html).
 
 Then install all dependencies using:
 

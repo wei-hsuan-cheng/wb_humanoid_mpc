@@ -17,13 +17,13 @@ TARGET="base"
 
 : "# Workspace directory inside container"
 WB_HUMANOID_MPC_DIR="/wb_humanoid_mpc_ws"
-PYTHON_VERSION="3.12"
+PYTHON_VERSION="3.10"
 USER_ID="$(id -u)"
 GROUP_ID="$(id -g)"
 GIT_USER_NAME="$(git config --global user.name || echo '')"
 GIT_USER_EMAIL="$(git config --global user.email || echo '')"
 
-IMAGE_TAG="wb-humanoid-mpc:jazzy"
+IMAGE_TAG="wb-humanoid-mpc:humble"
 
 docker build \
   --file "${DOCKERFILE}" \
