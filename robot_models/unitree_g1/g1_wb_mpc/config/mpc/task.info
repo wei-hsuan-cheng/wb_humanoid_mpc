@@ -1,8 +1,8 @@
 interface
 {
   verbose                               false  // show the loaded parameters
-  useAnalyticalGradientsDynamics        false
-  useAnalyticalGradientsConstraints     false
+  useAnalyticalGradientsDynamics        true // false; true
+  useAnalyticalGradientsConstraints     true // false; true
 }
 
 model_settings
