@@ -65,26 +65,61 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 
 Build all required pkgs:
 ```bash
-make build-all
+make build-all PARALLEL_JOBS=1
 ```
 
-Build centroidal dynamics MPC:
-```bash
-# OCS2 dependencies (centroidal dynamics)
-colcon build --symlink-install --packages-select \
-    ocs2_core ocs2_mpc ocs2_ddp ocs2_sqp ocs2_robotic_tools ocs2_pinocchio_interface \
-    ocs2_centroidal_model ocs2_ros2_interfaces ocs2_ros2_msgs 
+If build each pkg seperately:
 
-# Dummy sim
+<details>
+<summary>Build OCS2 core dependencies</summary>
+
+```bash
+# OCS2 dependencies
 colcon build --symlink-install --packages-select \
+    ocs2_core ocs2_mpc ocs2_ddp ocs2_sqp \
+    ocs2_robotic_tools ocs2_pinocchio_interface \
+    ocs2_ros2_interfaces ocs2_ros2_msgs 
+```
+
+</details>
+
+<details>
+<summary>Build centroidal dynamics MPC</summary>
+
+```bash
+# For dummy sim
+colcon build --symlink-install --packages-select \
+   ocs2_centroidal_model \
    humanoid_mpc_msgs humanoid_common_mpc humanoid_common_mpc_ros2 \
    humanoid_centroidal_mpc humanoid_centroidal_mpc_ros2 \
    remote_control g1_description g1_centroidal_mpc
+```
 
+</details>
+
+<details>
+<summary>Build whole-body dynamics MPC</summary>
+
+```bash
+# Dummy sim
+olcon build --symlink-install --packages-select \
+  humanoid_mpc_msgs humanoid_common_mpc humanoid_common_mpc_ros2 \
+  humanoid_wb_mpc humanoid_wb_mpc_ros2 \
+  remote_control g1_description g1_wb_mpc
+```
+
+</details>
+
+<details>
+<summary>Build mujoco sim interfaces</summary>
+
+```bash
 # MuJoCo sim
 colcon build --symlink-install --packages-select \
   mujoco_sim_interface robot_core robot_model
 ```
+
+</details>
 
 ## Running the examples
 Once you run the NMPC a window with Rviz will appear for visualization. The first time you start the MPC for a certain robot model the auto differentiation code will be generated which might take up to **5-15 min** depending on your system. Once done the robot appears and you can control it via an xbox gamepad or the controls in the terminal. 
