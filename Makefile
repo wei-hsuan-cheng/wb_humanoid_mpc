@@ -177,7 +177,7 @@ launch-g1-dummy-sim:
 	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_centroidal_mpc dummy_sim.launch.py 
 
-launch-g1-sim:
+launch-g1-mujoco-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
@@ -185,14 +185,14 @@ launch-g1-sim:
 	ros2 launch g1_centroidal_mpc mujoco_sim.launch.py 
 
 
-launch-wb-g1-dummy-sim:
+launch-g1-wb-dummy-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
 	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_wb_mpc dummy_sim.launch.py 
 
-launch-wb-g1-sim:
+launch-g1-wb-mujoco-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \

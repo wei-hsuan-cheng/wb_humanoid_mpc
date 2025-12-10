@@ -13,14 +13,14 @@ model_settings
 
   foot_constraint
   {
-    positionErrorGain_z             5.0
-    orientationErrorGain            20.0
-    linearVelocityErrorGain_z       1.0
-    linearVelocityErrorGain_xy      1.0
-    angularVelocityErrorGain        1.0
-    linearAccelerationErrorGain_z   0.0
-    linearAccelerationErrorGain_xy  0.0
-    angularAccelerationErrorGain    0.0
+    positionErrorGain_z             100.0 // 5.0; 100.0;
+    orientationErrorGain            80.0 // 20.0; 80.0;
+    linearVelocityErrorGain_z       10.0 // 1.0; 10.0;
+    linearVelocityErrorGain_xy      20.0 // 1.0; 20.0;
+    angularVelocityErrorGain        20.0 // 1.0; 20.0;
+    linearAccelerationErrorGain_z   1.0 // 0.0; 1.0;
+    linearAccelerationErrorGain_xy  1.0 // 0.0; 1.0;
+    angularAccelerationErrorGain    1.0 // 0.0; 1.0;
   }
 
   phaseTransitionStanceTime       0.0
