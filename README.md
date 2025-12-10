@@ -95,18 +95,18 @@ For the **Centroidal Dynamics MPC**
 
 ```bash
 # Dummy sim
-make launch-g1-dummy-sim
+make g1-dummy-sim
 # MuJoCo sim
-make launch-g1-sim
+make g1-mujoco-sim
 ```
 
 For the **Whole-Body Dynamics MPC**
 
 ```bash
 # Dummy sim
-make launch-wb-g1-dummy-sim
+make g1-wb-dummy-sim
 # MuJoCo sim
-make launch-wb-g1-sim
+make g1-wb-mujoco-sim
 ```
 
 Run `rviz2`
