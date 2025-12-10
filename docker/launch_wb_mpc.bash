@@ -40,7 +40,7 @@ docker run -it \
   -e XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}" \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   -v "${XAUTH}:${XAUTH}:rw" \
-  -v "${HOST_WS}:/root/src/wb_humanoid_mpc:cached" \
+  -v "${HOST_WS}:/wb_humanoid_mpc_ws/src/wb_humanoid_mpc:cached" \
   --workdir /wb_humanoid_mpc_ws \
   wb-humanoid-mpc:humble \
   bash
