@@ -5,18 +5,10 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /Status1
-        - /Grid1
-        - /RobotModel1
         - /RobotModel1/Description Topic1
-        - /TF1/Frames1
-        - /Cartesian Markers1
         - /Cartesian Markers1/Namespaces1
-        - /OptimizedStateTrajectory1
-        - /Terminal Target RobotModel1
-        - /CollisionMarkerArray1
       Splitter Ratio: 0.5
-    Tree Height: 549
+    Tree Height: 733
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -43,7 +35,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 0.4000000059604645
+    - Alpha: 0.6000000238418579
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
       Description File: ""
@@ -266,25 +258,425 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz_default_plugins/TF
-      Enabled: false
+      Enabled: true
       Filter (blacklist): ""
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
+        d435_link:
+          Value: false
+        head_link:
+          Value: false
+        imu_in_pelvis:
+          Value: false
+        imu_in_torso:
+          Value: false
+        left_ankle_pitch_link:
+          Value: false
+        left_ankle_roll_link:
+          Value: false
+        left_elbow_link:
+          Value: false
+        left_hip_pitch_link:
+          Value: false
+        left_hip_roll_link:
+          Value: false
+        left_hip_yaw_link:
+          Value: false
+        left_knee_link:
+          Value: false
+        left_rubber_hand:
+          Value: false
+        left_shoulder_pitch_link:
+          Value: false
+        left_shoulder_roll_link:
+          Value: false
+        left_shoulder_yaw_link:
+          Value: false
+        left_wrist_pitch_link:
+          Value: false
+        left_wrist_roll_link:
+          Value: false
+        left_wrist_yaw_link:
+          Value: false
+        logo_link:
+          Value: false
+        mid360_link:
+          Value: false
+        pelvis:
+          Value: true
+        pelvis_contour_link:
+          Value: false
+        right_ankle_pitch_link:
+          Value: false
+        right_ankle_roll_link:
+          Value: false
+        right_elbow_link:
+          Value: false
+        right_hip_pitch_link:
+          Value: false
+        right_hip_roll_link:
+          Value: false
+        right_hip_yaw_link:
+          Value: false
+        right_knee_link:
+          Value: false
+        right_rubber_hand:
+          Value: false
+        right_shoulder_pitch_link:
+          Value: false
+        right_shoulder_roll_link:
+          Value: false
+        right_shoulder_yaw_link:
+          Value: false
+        right_wrist_pitch_link:
+          Value: false
+        right_wrist_roll_link:
+          Value: false
+        right_wrist_yaw_link:
+          Value: false
+        terminal_state/d435_link:
+          Value: false
+        terminal_state/head_link:
+          Value: false
+        terminal_state/imu_in_pelvis:
+          Value: false
+        terminal_state/imu_in_torso:
+          Value: false
+        terminal_state/left_ankle_pitch_link:
+          Value: false
+        terminal_state/left_ankle_roll_link:
+          Value: false
+        terminal_state/left_elbow_link:
+          Value: false
+        terminal_state/left_hip_pitch_link:
+          Value: false
+        terminal_state/left_hip_roll_link:
+          Value: false
+        terminal_state/left_hip_yaw_link:
+          Value: false
+        terminal_state/left_knee_link:
+          Value: false
+        terminal_state/left_rubber_hand:
+          Value: false
+        terminal_state/left_shoulder_pitch_link:
+          Value: false
+        terminal_state/left_shoulder_roll_link:
+          Value: false
+        terminal_state/left_shoulder_yaw_link:
+          Value: false
+        terminal_state/left_wrist_pitch_link:
+          Value: false
+        terminal_state/left_wrist_roll_link:
+          Value: false
+        terminal_state/left_wrist_yaw_link:
+          Value: false
+        terminal_state/logo_link:
+          Value: false
+        terminal_state/mid360_link:
+          Value: false
+        terminal_state/pelvis:
+          Value: false
+        terminal_state/pelvis_contour_link:
+          Value: false
+        terminal_state/right_ankle_pitch_link:
+          Value: false
+        terminal_state/right_ankle_roll_link:
+          Value: false
+        terminal_state/right_elbow_link:
+          Value: false
+        terminal_state/right_hip_pitch_link:
+          Value: false
+        terminal_state/right_hip_roll_link:
+          Value: false
+        terminal_state/right_hip_yaw_link:
+          Value: false
+        terminal_state/right_knee_link:
+          Value: false
+        terminal_state/right_rubber_hand:
+          Value: false
+        terminal_state/right_shoulder_pitch_link:
+          Value: false
+        terminal_state/right_shoulder_roll_link:
+          Value: false
+        terminal_state/right_shoulder_yaw_link:
+          Value: false
+        terminal_state/right_wrist_pitch_link:
+          Value: false
+        terminal_state/right_wrist_roll_link:
+          Value: false
+        terminal_state/right_wrist_yaw_link:
+          Value: false
+        terminal_state/torso_link:
+          Value: false
+        terminal_state/waist_roll_link:
+          Value: false
+        terminal_state/waist_support_link:
+          Value: false
+        terminal_state/waist_yaw_link:
+          Value: false
+        terminal_target/d435_link:
+          Value: false
+        terminal_target/head_link:
+          Value: false
+        terminal_target/imu_in_pelvis:
+          Value: false
+        terminal_target/imu_in_torso:
+          Value: false
+        terminal_target/left_ankle_pitch_link:
+          Value: false
+        terminal_target/left_ankle_roll_link:
+          Value: false
+        terminal_target/left_elbow_link:
+          Value: false
+        terminal_target/left_hip_pitch_link:
+          Value: false
+        terminal_target/left_hip_roll_link:
+          Value: false
+        terminal_target/left_hip_yaw_link:
+          Value: false
+        terminal_target/left_knee_link:
+          Value: false
+        terminal_target/left_rubber_hand:
+          Value: false
+        terminal_target/left_shoulder_pitch_link:
+          Value: false
+        terminal_target/left_shoulder_roll_link:
+          Value: false
+        terminal_target/left_shoulder_yaw_link:
+          Value: false
+        terminal_target/left_wrist_pitch_link:
+          Value: false
+        terminal_target/left_wrist_roll_link:
+          Value: false
+        terminal_target/left_wrist_yaw_link:
+          Value: false
+        terminal_target/logo_link:
+          Value: false
+        terminal_target/mid360_link:
+          Value: false
+        terminal_target/pelvis:
+          Value: true
+        terminal_target/pelvis_contour_link:
+          Value: false
+        terminal_target/right_ankle_pitch_link:
+          Value: false
+        terminal_target/right_ankle_roll_link:
+          Value: false
+        terminal_target/right_elbow_link:
+          Value: false
+        terminal_target/right_hip_pitch_link:
+          Value: false
+        terminal_target/right_hip_roll_link:
+          Value: false
+        terminal_target/right_hip_yaw_link:
+          Value: false
+        terminal_target/right_knee_link:
+          Value: false
+        terminal_target/right_rubber_hand:
+          Value: false
+        terminal_target/right_shoulder_pitch_link:
+          Value: false
+        terminal_target/right_shoulder_roll_link:
+          Value: false
+        terminal_target/right_shoulder_yaw_link:
+          Value: false
+        terminal_target/right_wrist_pitch_link:
+          Value: false
+        terminal_target/right_wrist_roll_link:
+          Value: false
+        terminal_target/right_wrist_yaw_link:
+          Value: false
+        terminal_target/torso_link:
+          Value: false
+        terminal_target/waist_roll_link:
+          Value: false
+        terminal_target/waist_support_link:
+          Value: false
+        terminal_target/waist_yaw_link:
+          Value: false
+        torso_link:
+          Value: false
+        waist_roll_link:
+          Value: false
+        waist_support_link:
+          Value: false
+        waist_yaw_link:
+          Value: false
+        world:
+          Value: true
       Marker Scale: 0.30000001192092896
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: true
+      Show Names: false
       Tree:
-        {}
+        world:
+          pelvis:
+            imu_in_pelvis:
+              {}
+            left_hip_pitch_link:
+              left_hip_roll_link:
+                left_hip_yaw_link:
+                  left_knee_link:
+                    left_ankle_pitch_link:
+                      left_ankle_roll_link:
+                        {}
+            pelvis_contour_link:
+              {}
+            right_hip_pitch_link:
+              right_hip_roll_link:
+                right_hip_yaw_link:
+                  right_knee_link:
+                    right_ankle_pitch_link:
+                      right_ankle_roll_link:
+                        {}
+            waist_yaw_link:
+              waist_roll_link:
+                torso_link:
+                  d435_link:
+                    {}
+                  head_link:
+                    {}
+                  imu_in_torso:
+                    {}
+                  left_shoulder_pitch_link:
+                    left_shoulder_roll_link:
+                      left_shoulder_yaw_link:
+                        left_elbow_link:
+                          left_wrist_roll_link:
+                            left_wrist_pitch_link:
+                              left_wrist_yaw_link:
+                                left_rubber_hand:
+                                  {}
+                  logo_link:
+                    {}
+                  mid360_link:
+                    {}
+                  right_shoulder_pitch_link:
+                    right_shoulder_roll_link:
+                      right_shoulder_yaw_link:
+                        right_elbow_link:
+                          right_wrist_roll_link:
+                            right_wrist_pitch_link:
+                              right_wrist_yaw_link:
+                                right_rubber_hand:
+                                  {}
+                  waist_support_link:
+                    {}
+          terminal_state/pelvis:
+            terminal_state/imu_in_pelvis:
+              {}
+            terminal_state/left_hip_pitch_link:
+              terminal_state/left_hip_roll_link:
+                terminal_state/left_hip_yaw_link:
+                  terminal_state/left_knee_link:
+                    terminal_state/left_ankle_pitch_link:
+                      terminal_state/left_ankle_roll_link:
+                        {}
+            terminal_state/pelvis_contour_link:
+              {}
+            terminal_state/right_hip_pitch_link:
+              terminal_state/right_hip_roll_link:
+                terminal_state/right_hip_yaw_link:
+                  terminal_state/right_knee_link:
+                    terminal_state/right_ankle_pitch_link:
+                      terminal_state/right_ankle_roll_link:
+                        {}
+            terminal_state/waist_yaw_link:
+              terminal_state/waist_roll_link:
+                terminal_state/torso_link:
+                  terminal_state/d435_link:
+                    {}
+                  terminal_state/head_link:
+                    {}
+                  terminal_state/imu_in_torso:
+                    {}
+                  terminal_state/left_shoulder_pitch_link:
+                    terminal_state/left_shoulder_roll_link:
+                      terminal_state/left_shoulder_yaw_link:
+                        terminal_state/left_elbow_link:
+                          terminal_state/left_wrist_roll_link:
+                            terminal_state/left_wrist_pitch_link:
+                              terminal_state/left_wrist_yaw_link:
+                                terminal_state/left_rubber_hand:
+                                  {}
+                  terminal_state/logo_link:
+                    {}
+                  terminal_state/mid360_link:
+                    {}
+                  terminal_state/right_shoulder_pitch_link:
+                    terminal_state/right_shoulder_roll_link:
+                      terminal_state/right_shoulder_yaw_link:
+                        terminal_state/right_elbow_link:
+                          terminal_state/right_wrist_roll_link:
+                            terminal_state/right_wrist_pitch_link:
+                              terminal_state/right_wrist_yaw_link:
+                                terminal_state/right_rubber_hand:
+                                  {}
+                  terminal_state/waist_support_link:
+                    {}
+          terminal_target/pelvis:
+            terminal_target/imu_in_pelvis:
+              {}
+            terminal_target/left_hip_pitch_link:
+              terminal_target/left_hip_roll_link:
+                terminal_target/left_hip_yaw_link:
+                  terminal_target/left_knee_link:
+                    terminal_target/left_ankle_pitch_link:
+                      terminal_target/left_ankle_roll_link:
+                        {}
+            terminal_target/pelvis_contour_link:
+              {}
+            terminal_target/right_hip_pitch_link:
+              terminal_target/right_hip_roll_link:
+                terminal_target/right_hip_yaw_link:
+                  terminal_target/right_knee_link:
+                    terminal_target/right_ankle_pitch_link:
+                      terminal_target/right_ankle_roll_link:
+                        {}
+            terminal_target/waist_yaw_link:
+              terminal_target/waist_roll_link:
+                terminal_target/torso_link:
+                  terminal_target/d435_link:
+                    {}
+                  terminal_target/head_link:
+                    {}
+                  terminal_target/imu_in_torso:
+                    {}
+                  terminal_target/left_shoulder_pitch_link:
+                    terminal_target/left_shoulder_roll_link:
+                      terminal_target/left_shoulder_yaw_link:
+                        terminal_target/left_elbow_link:
+                          terminal_target/left_wrist_roll_link:
+                            terminal_target/left_wrist_pitch_link:
+                              terminal_target/left_wrist_yaw_link:
+                                terminal_target/left_rubber_hand:
+                                  {}
+                  terminal_target/logo_link:
+                    {}
+                  terminal_target/mid360_link:
+                    {}
+                  terminal_target/right_shoulder_pitch_link:
+                    terminal_target/right_shoulder_roll_link:
+                      terminal_target/right_shoulder_yaw_link:
+                        terminal_target/right_elbow_link:
+                          terminal_target/right_wrist_roll_link:
+                            terminal_target/right_wrist_pitch_link:
+                              terminal_target/right_wrist_yaw_link:
+                                terminal_target/right_rubber_hand:
+                                  {}
+                  terminal_target/waist_support_link:
+                    {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: Cartesian Markers
       Namespaces:
+        Center of Pressure: true
+        EE Forces: true
         equivalentContactCornerForces: false
       Topic:
         Depth: 5
@@ -361,17 +753,17 @@ Visualization Manager:
       Value: false
       Visual Enabled: true
     - Class: rviz_default_plugins/MarkerArray
-      Enabled: false
+      Enabled: true
       Name: CollisionMarkerArray
       Namespaces:
-        {}
+        "": true
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /collision_markers
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 238; 238; 236
@@ -393,35 +785,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.4502856731414795
+      Distance: 2.3954551219940186
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.608772337436676
-        Y: 0.09100822359323502
-        Z: 0.0074924081563949585
+        X: 0.42619988322257996
+        Y: 0.5522159934043884
+        Z: 0.03478170186281204
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.36879807710647583
+      Pitch: 0.20379824936389923
       Target Frame: pelvis
       Value: Orbit (rviz)
-      Yaw: 6.122678756713867
+      Yaw: 0.5094907879829407
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1135
+  Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000001000000000000029d00000417fc0200000003fb000000100044006900730070006c006100790073010000003c000002eb000000c800fffffffb0000000c00430061006d0065007200610100000725000000e90000000000000000fb0000000a00560069006500770073010000032d00000126000000a200ffffff000004dd0000041700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000029d000003a2fc0200000003fb000000100044006900730070006c006100790073000000003b000003a2000000c700fffffffb0000000c00430061006d0065007200610100000725000000e90000000000000000fb0000000a0056006900650077007300000002d800000105000000a000ffffff0000073a000003a200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1920
-  X: 876
-  Y: 360
+  Width: 1850
+  X: 70
+  Y: 27
