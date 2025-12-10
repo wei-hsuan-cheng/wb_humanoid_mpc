@@ -36,13 +36,11 @@ mkdir -p humanoid_mpc_ws/src && cd humanoid_mpc_ws/src
 git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b humble
 ```
 
-### Install Dependencies
-The project supports both Dockerized workspaces (recommended) or a local installation for developing and running the humanoid MPC. 
 
-<details>
-<summary> Build & run Dockerized workspace with bash scripts</summary>
+### Build & run Dockerized workspace with bash scripts
 
-This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image using the arguments defined in `devcontainer.json`. `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
+This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image using the arguments defined in `devcontainer.json`. 
+`launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
 ```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./image_build.bash
@@ -53,21 +51,6 @@ cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
 ./launch_wb_mpc.bash
 ```
 
-</details>
-
-<details>
-<summary>Install Dependencies Locally</summary>
-
-Make sure you have **ros2** installed on your system as e.g specified for humble in
-the [installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html).
-
-Then install all dependencies using:
-
-```bash
-envsubst < dependencies.txt | xargs sudo apt install -y
-```
-</details>
-
 
 ### Building the MPC 
 
@@ -75,7 +58,7 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 
 | PARALLEL_JOBS | Required System RAM |
 |--------------:|--------------------:|
-| 2 (default)   |  16 GiB             | 
+| 1 (default)   |  16 GiB             | 
 | 4             |  32 GiB             |
 | 6             |  64 GiB             | 
 
