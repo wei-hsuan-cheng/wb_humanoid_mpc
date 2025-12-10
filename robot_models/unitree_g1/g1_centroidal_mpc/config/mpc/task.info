@@ -99,8 +99,8 @@ multiple_shooting
 ; Rollout settings
 rollout
 {
-  AbsTolODE                       5e-5
-  RelTolODE                       5e-3
+  AbsTolODE                       1e-5
+  RelTolODE                       1e-3
   timeStep                        0.015
   integratorType                  ODE45
   maxNumStepsPerSecond            10000
@@ -115,8 +115,8 @@ mpc
 
   debugPrint                      false
 
-  mpcDesiredFrequency              80 ; [Hz] // 80
-  mrtDesiredFrequency             100 ; [Hz] // 100
+  mpcDesiredFrequency             100 ; [Hz] // 80
+  mrtDesiredFrequency             500 ; [Hz] // 100
 }
 
 initialState
