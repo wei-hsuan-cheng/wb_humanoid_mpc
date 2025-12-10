@@ -40,3 +40,5 @@ RUN mkdir -p ${WB_HUMANOID_MPC_DIR}/src
 RUN if ! getent group $GROUP_ID > /dev/null; then groupadd --gid $GROUP_ID devgroup; fi && \
     if ! getent passwd $USER_ID > /dev/null; then useradd --uid $USER_ID --gid $GROUP_ID --create-home devuser; fi && \
     chown -R $USER_ID:$GROUP_ID .
+
+RUN apt install vim -y

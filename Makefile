@@ -12,6 +12,8 @@ CCACHE_DIR := $(build_dir)/.ccache
 
 ros_source_file := /opt/ros/humble/setup.bash
 
+ros_domain_id := 52
+
 LINKER_FLAGS = "$(shell python3-config --ldflags --embed)"
 
 # Find ROS2 packages in a given directory, two levels deep, and return only the package name
@@ -167,16 +169,19 @@ format:
 	find . -name "lib" -prune -o \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -print | xargs clang-format -i && \
 	black . --exclude="lib/"
 
+# Launch examples
 launch-g1-dummy-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
+	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_centroidal_mpc dummy_sim.launch.py 
 
 launch-g1-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
+	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_centroidal_mpc mujoco_sim.launch.py 
 
 
@@ -184,12 +189,14 @@ launch-wb-g1-dummy-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
+	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_wb_mpc dummy_sim.launch.py 
 
 launch-wb-g1-sim:
 	cd ${build_dir} && \
 	source ${ros_source_file} && \
 	source install/setup.bash && \
+	export ROS_DOMAIN_ID=${ros_domain_id} && \
 	ros2 launch g1_wb_mpc mujoco_sim.launch.py 
 
 run-ocs2-tests:
