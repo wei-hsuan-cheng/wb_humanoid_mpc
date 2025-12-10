@@ -10,17 +10,7 @@ build_dir ?= $(abspath $(lastword $(MAKEFILE_LIST))/../../..)
 
 CCACHE_DIR := $(build_dir)/.ccache
 
-ros_source_file := /bin/ros_setup.sh
-
-ifeq ("$(wildcard /opt/ros/jazzy/setup.bash)","")
-    ifeq ("$(wildcard $(ros_source_file))","")
-        ros_source_file := /opt/ros/humble/setup.bash
-    endif
-else
-    ifeq ("$(wildcard $(ros_source_file))","")
-        ros_source_file := /opt/ros/jazzy/setup.bash
-    endif
-endif
+ros_source_file := /opt/ros/humble/setup.bash
 
 LINKER_FLAGS = "$(shell python3-config --ldflags --embed)"
 
