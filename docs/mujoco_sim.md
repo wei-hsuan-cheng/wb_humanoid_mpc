@@ -18,7 +18,7 @@ This document describes how the humanoid MPC examples in this repo use **MuJoCo*
 ### In each iteration of control loop
   1. MuJoCo advances the full‑body dynamics (the physical interactions).
   2. The sim state is mapped into a [`RobotState.cpp`](../robot_runtime/robot_model/src/RobotState.cpp).
-  3. MPC computes joint targets and torques into a [`RobotJointAction.h`](../robot_runtime/robot_model/include/robot_model/RobotJointAction.h).
+  3. MPC computes joint torque commands from desired and feedback joint states via [`RobotJointAction.h`](../robot_runtime/robot_model/include/robot_model/RobotJointAction.h).
   4. [`MujocoSimInterface.cpp`](../robot_runtime/mujoco_sim_interface/src/MujocoSimInterface.cpp) writes those torque commands back to MuJoCo actuators (`mjData->ctrl`).
 
 ---
