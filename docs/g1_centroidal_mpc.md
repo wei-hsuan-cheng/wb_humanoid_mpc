@@ -1,6 +1,6 @@
 # Unitree G1 Centroidal MPC
 
-This file summarizes the centroidal NMPC stack exercised by `make launch-g1-dummy-sim`, with code pointers and compact math for the model, rollout, constraints, sensing, and actuation.
+This file summarizes the centroidal NMPC stack exercised by `make g1-dummy-sim` or `make g1-mujoco-sim`, with code pointers and compact math for the model, rollout, constraints, sensing, and actuation.
 
 ## State, Input, and Dynamics
 

@@ -98,7 +98,7 @@ rollout
 {
   AbsTolODE                       1e-5
   RelTolODE                       1e-3
-  timeStep                        0.015
+  timeStep                        0.015 // should be smaller or equal to multiple_shooting.dt
   integratorType                  ODE45
   maxNumStepsPerSecond            10000
   checkNumericalStability         false
@@ -106,13 +106,13 @@ rollout
 
 mpc
 {
-  timeHorizon                     1.2  ; [s]
+  timeHorizon                     1.4  ; [s] // 40 * multiple_shooting.dt
   solutionTimeWindow              -1   ; maximum [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             60  ; [Hz] // 60
+  mpcDesiredFrequency             50  ; [Hz] // 60
   mrtDesiredFrequency             500 ; [Hz] // 500
 }
 
@@ -121,7 +121,7 @@ initialState
 ;; Base Pose: [position, orientation] ;;
   (0,0)   0.0       ; p_base_x
   (1,0)   0.0       ; p_base_y
-  (2,0)   0.8      ; p_base_z
+  (2,0)   0.7925    ; p_base_z
   (3,0)   0.0       ; theta_base_z
   (4,0)   0.0       ; theta_base_y
   (5,0)   0.0       ; theta_base_x
