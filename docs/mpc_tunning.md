@@ -89,3 +89,38 @@ If you change `dt` or `mpcDesiredFrequency`, you should always:
 - Test closed‑loop behavior in MuJoCo (standing/walking stability).
 - Adjust some cost weights if the controller becomes too aggressive or sluggish under the new timings.
 
+## MRT and Receding Horizon Interpretation
+
+In this setup the control architecture is split into:
+
+- **MPC solve (slow loop, `mpcDesiredFrequency`)**
+  - At time `t_k` solves an OCP over `[t_k, t_k + T]` and produces a time‑stamped policy
+    (nominal state/input trajectory and, if enabled, linear feedback gains).
+  - In your configs this happens every `T_mpc = 1 / mpcDesiredFrequency` seconds.
+
+- **MRT loop (fast loop, `mrtDesiredFrequency`)**
+  - Runs at a higher rate.
+  - At each MRT tick between `t_k` and `t_{k+1}`:
+    - Reads the current observation (time, state, mode).
+    - Evaluates the *current* policy at that time (and state, if feedback is enabled).
+    - Sends the resulting control to the plant (MuJoCo or dummy simulator).
+  - When a new MPC solution becomes available at `t_{k+1}`, MRT switches to the new policy
+    and never uses the tail of the old one again.
+
+This is still a receding‑horizon controller:
+
+- Only the **front part** of each optimized horizon is ever applied on the real system; the rest
+  is used to plan ahead and is discarded when the next solve completes.
+- Because `T_mpc` is smaller than `dt` in your configs, you effectively only use the segment near
+  the first grid point of each policy before re‑solving; later samples `u[1…N‑1]` shape the
+  optimization but are not executed verbatim.
+
+Effect of `useFeedbackPolicy`:
+
+- With `useFeedbackPolicy = true`:
+  - MRT applies `u(t) = u_ff(t) + K(t) (x(t) − x_ref(t))`, using both feed‑forward and local
+    linear feedback from the MPC solution.
+- With `useFeedbackPolicy = false` (your current setting):
+  - MRT applies **pure feed‑forward** `u(t) = u_ff(t)` (still time‑varying and interpolated),
+    and robustness relies on frequent re‑optimization rather than on the local LQR term.
+

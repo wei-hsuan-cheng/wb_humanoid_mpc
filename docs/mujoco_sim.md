@@ -9,7 +9,7 @@ This document describes how the humanoid MPC examples in this repo use **MuJoCo*
   
   - The torque commands are sent to a custom **hardware control interface** `robot_runtime/robot_model` that implements a [`RobotHWInterfaceBase.h`](../robot_runtime/robot_model/include/robot_model/RobotHWInterfaceBase.h) (not through `ros2_control hardware_interface`) 
   
-  - MuJoCo as the **physics backend** via [`MujocoSimInterface.cpp`](../robot_runtime/mujoco_sim_interface/include/mujoco_sim_interface/MujocoSimInterface.cpp).
+  - MuJoCo as the **physics backend** via [`MujocoSimInterface.cpp`](../robot_runtime/mujoco_sim_interface/src/MujocoSimInterface.cpp).
 
 - Robot configurations (kinematical structure and joint limits) come from a **URDF** (*e.g.,* [`g1_29dof.urdf`](../robot_models/unitree_g1/g1_description/urdf/g1_29dof.urdf)), parsed into [`RobotDescription.cpp`](../robot_runtime/robot_model/src/RobotDescription.cpp).
 
@@ -393,8 +393,6 @@ wb_humanoid_mpc/
 │   │   ├── src/
 │   │   │   ├── MujocoSimInterface.cpp
 │   │   │   └── MujocoRenderer.cpp
-│   │   └── exe/
-│   │       └── mujocoSimNoTorques.cpp
 │   ├── robot_model/
 │   │   ├── include/robot_model/
 │   │   │   ├── RobotHWInterfaceBase.h
