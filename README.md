@@ -2,28 +2,27 @@
 
 **Forked from [`manumerous/wb_humanoid_mpc`](https://github.com/manumerous/wb_humanoid_mpc) with some bugs fixed.**
 
-This repository contains a Whole-Body Nonlinear Model Predictive Controller (NMPC) for humanoid loco-manipulation control. This approach enables to directly optimize through the **full-order torque-level dynamics in realtime** to generate a wide range of humanoid behaviors building up on an [extended & updated version of ocs2](https://github.com/manumerous/ocs2_ros2)
+This repository contains a **torque-controlled Whole-Body Nonlinear Model Predictive Controller (NMPC)** for humanoid loco-manipulation control. The MPC model and solvers are built up on [OCS2](https://github.com/leggedrobotics/ocs2), a powerful optimal control platform. The codes are successfully tested in `ros2 humble`.
 
-**Interactive Velocity and Base Height Control via Joystick:**
-![Screencast2024-12-16180254-ezgif com-optimize(3)](https://github.com/user-attachments/assets/d4b1f0da-39ca-4ce1-b53c-e1d040abe1be)
+### Interactive Velocity and Base Height Control via GUI & Joystick
 
+<p align="center">
+  <img src="./assets/ocs2_humanoid_centroidal_mpc_mujoco_sim.gif" />
+</p>
 
-It contains the following hardware platform agnostic MPC fromulations:
+## MPC Formulations
+
+This repo contains examples for two MPC formulations: **centroidal (hierarchical) vs. whole-body**.
 
 ### Centroidal Dynamics MPC
-The centroidal MPC optimizes over the **whole-body kinematics** and the center off mass dynamics, with a choice to either use a single rigid 
-body model or the full centroidal dynamics. This specific approach builds up on the centroidal model in ocs2 by generalizing costs and constraints to a 6 DoF contact among others. I am still working on documenting this. Until then a conscise explanation of the ocs2 centroidal model can be found here [Sleiman et. al., A Unified MPC Framework for Whole-Body Dynamic Locomotion and Manipulation](https://arxiv.org/abs/2103.00946)
+The centroidal MPC optimizes over the **whole-body kinematics** and the center of mass dynamics, with a choice to either use a single rigid body model or the full centroidal dynamics. This specific approach builds up on the centroidal model in ocs2 by generalizing costs and constraints to a 6-DoF contact among others. A conscise explanation of the ocs2 centroidal model can be found in [Sleiman et. al., A Unified MPC Framework for Whole-Body Dynamic Locomotion and Manipulation](https://arxiv.org/abs/2103.00946).
 
 ### Whole-Body Dynamics MPC
-The **whole-body dynamics** MPC optimized over the contact forces and joint accelerations with the option to compute the joint torques for 
-each step planned accross the horizon. I am still working on documenting and publishing the approach. The most relevant information on the choosen approach can currently be found in [Galliker et al., Bipedal Locomotion with Nonlinear Model Predictive Control:
-Online Gait Generation using Whole-Body Dynamics](http://ames.caltech.edu/galliker2022bipedal.pdf)
+The **whole-body dynamics** MPC optimized over the contact forces and joint accelerations with the option to compute the joint torques for each step planned accross the horizon. The most relevant information on the choosen approach can currently be found in [Galliker et al., Bipedal Locomotion with Nonlinear Model Predictive Control: Online Gait Generation using Whole-Body Dynamics](http://ames.caltech.edu/galliker2022bipedal.pdf).
+
 ### Robot Examples
 
-The project supports the following robot examples:
-
-- Unitree G1
-- 1X Neo (Comming soon)
+The project supports [Unitree G1](https://www.unitree.com/g1) robot model.
 
 ## Get Started
 
@@ -39,17 +38,19 @@ git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b humble
 
 ### Build & run Dockerized workspace with bash scripts
 
-This repository includes two helper scripts: `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image using the arguments defined in `devcontainer.json`. 
-`launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code. Example of building docker image:
-```bash
-cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
-./image_build.bash
-```
-and launching the docker container:
-```bash
-cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
-./launch_wb_mpc.bash
-```
+This repository includes two helper scripts. Run them sequentially.
+
+- `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image with building arguments specified inside. 
+   ```bash
+   cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
+   ./image_build.bash
+   ```
+
+- `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code.
+   ```bash
+   cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
+   ./launch_wb_mpc.bash
+   ```
 
 
 ### Building the MPC 
@@ -63,8 +64,9 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 | 6             |  64 GiB             | 
 
 
-Build all required pkgs:
+Build all required pkgs from a helper script `Makefile`:
 ```bash
+cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc
 make build-all PARALLEL_JOBS=1
 ```
 
@@ -75,6 +77,7 @@ If build each pkg seperately:
 
 ```bash
 # OCS2 dependencies
+cd /path/to/humanoid_mpc_ws
 colcon build --symlink-install --packages-select \
     ocs2_core ocs2_mpc ocs2_ddp ocs2_sqp \
     ocs2_robotic_tools ocs2_pinocchio_interface \
@@ -88,6 +91,7 @@ colcon build --symlink-install --packages-select \
 
 ```bash
 # For dummy sim
+cd /path/to/humanoid_mpc_ws
 colcon build --symlink-install --packages-select \
    ocs2_centroidal_model \
    humanoid_mpc_msgs humanoid_common_mpc humanoid_common_mpc_ros2 \
@@ -102,7 +106,8 @@ colcon build --symlink-install --packages-select \
 
 ```bash
 # Dummy sim
-olcon build --symlink-install --packages-select \
+cd /path/to/humanoid_mpc_ws
+colcon build --symlink-install --packages-select \
   humanoid_mpc_msgs humanoid_common_mpc humanoid_common_mpc_ros2 \
   humanoid_wb_mpc humanoid_wb_mpc_ros2 \
   remote_control g1_description g1_wb_mpc
@@ -115,6 +120,7 @@ olcon build --symlink-install --packages-select \
 
 ```bash
 # MuJoCo sim
+cd /path/to/humanoid_mpc_ws
 colcon build --symlink-install --packages-select \
   mujoco_sim_interface robot_core robot_model
 ```
@@ -155,28 +161,6 @@ Command a desired base velocity and root link height via **Robot Base Controller
 ![robot_remote_control](https://github.com/user-attachments/assets/779be1da-97a1-4d0c-8f9b-b9d2df88384f)
 
 
-## Citing Whole-Body Humanoid MPC
-To cite the Whole-Body Humanoid MPC in your academic research, please consider citing the following web BibTeX entry:
-
-```
-@misc{wholebodyhumanoidmpcweb,
-   author = {Manuel Yves Galliker},
-   title = {Whole-body Humanoid MPC: Realtime Physics-Based Procedural Loco-Manipulation Planning and Control},
-   howpublished = {https://github.com/1x-technologies/wb_humanoid_mpc},
-   year = {2024}
-}
-```
-
 ## Acknowledgements
-Created and actively maintained by [Manuel Yves Galliker](https://github.com/manumerous).
 
-Special thanks go to [Nicholas Palermo](https://github.com/nicholaspalomo) for implementing the dockerization among other great inputs and contributions. 
-
-This project is founded on the great work of many open-source contributors. I would especially like to acknowledge:
-- [ocs2](https://github.com/leggedrobotics/ocs2)
-- [pinocchio](https://github.com/stack-of-tasks/pinocchio)
-- [hpipm](https://github.com/giaf/hpipm)
-  
-Part of this work was developed during my time at [1X Technologies](https://www.1x.tech/). I would like to kindly thank Eric Jang and Bernt Børnich for supporting the open sourcing of this project. 
-
-Further I would like to thank Michael Purcell, Jesper Smith, Simon Zimmermann, Joel Filho, Paal Arthur Schjelderup Thorseth, Varit (Ohm) Vichathorn, Sjur Grønnevik Wroldsen, Armin Nurkanovic, Charles Khazoom and Farbod Farshidian for the many fruitful discussions, insights, contributions and support. 
+This repository is originally forked from [`manumerous/wb_humanoid_mpc`](https://github.com/manumerous/wb_humanoid_mpc) and is built up on [`leggedrobotics/ocs2`](https://github.com/leggedrobotics/ocs2) with `ros2` migration.
