@@ -12,7 +12,7 @@ This repository contains a **torque-controlled Whole-Body Nonlinear Model Predic
 
 ## MPC Formulations
 
-This repo contains examples for two MPC formulations: **centroidal (hierarchical) vs. whole-body**.
+This repo contains examples for two MPC formulations: **centroidal dynamics (hierarchical) vs. whole-body dynamics**.
 
 ### Centroidal Dynamics MPC
 The centroidal MPC optimizes over the **whole-body kinematics** and the center of mass dynamics, with a choice to either use a single rigid body model or the full centroidal dynamics. This specific approach builds up on the centroidal model in ocs2 by generalizing costs and constraints to a 6-DoF contact among others. A conscise explanation of the ocs2 centroidal model can be found in [Sleiman et. al., A Unified MPC Framework for Whole-Body Dynamic Locomotion and Manipulation](https://arxiv.org/abs/2103.00946).
