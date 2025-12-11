@@ -23,6 +23,44 @@ This document describes how the humanoid MPC examples in this repo use **MuJoCo*
 
 ---
 
+## Whole‑Body MPC + MuJoCo
+
+### Simulation Entrypoint: `WBMpcRobotSim`
+
+File: [`humanoid_nmpc/humanoid_wb_mpc_ros2/src/WBMpcRobotSim.cpp`](../humanoid_nmpc/humanoid_wb_mpc_ros2/src/WBMpcRobotSim.cpp)
+
+- Command‑line arguments:
+  - `robotName`, `taskFile`, `referenceFile`, `urdfFile`, `gaitFile`, `mjxFile`.
+  - `urdfFile` is the robot description used by both MPC and `RobotDescription`.
+  - `mjxFile` is the MuJoCo scene/model file (`MujocoSimConfig::scenePath`).
+- MPC stack:
+  - Builds `WBMpcInterface` from the task and reference files.
+  - Instantiates `SqpMpc` and sets up reference managers and ROS 2 visualization.
+- Initial state for simulation:
+  - Builds a `RobotDescription` and `RobotState` from `urdfFile`.
+  - Uses the MPC robot model (`interface.getMpcRobotModel()`) to:
+    - Set the base position from the OCS2 initial state.
+    - Populate joint angles for the MPC model joints.
+- MuJoCo interface:
+  - Fills a `robot::mujoco_sim_interface::MujocoSimConfig` with:
+    - `scenePath = mjxFile`.
+    - `initStatePtr_` pointing to the initialized `RobotState`.
+    - `dt` and `verbose` as desired.
+  - Constructs `MujocoSimInterface robotInterface(config, urdfFile)`.
+  - Creates `WBMpcMrtJointController` with:
+    - The same `RobotDescription` used by MuJoCo.
+    - MPC model settings and Pinocchio interface.
+- Runtime loop:
+  1. `robotInterface.initSim()` performs one MuJoCo step and optionally starts rendering.
+  2. `mpcJointController.startMpcThread(robotInterface.getRobotState())` spawns the MPC thread.
+  3. After the first MPC policy is received, `robotInterface.startSim()` starts the MuJoCo sim thread.
+  4. The main loop runs at `mrtDeltaTMicroSeconds_` (here hard‑coded to 500 Hz):
+     - `robotInterface.updateInterfaceStateFromRobot()` copies the internal MuJoCo state into the public `RobotState`.
+     - `mpcJointController.computeJointControlAction(...)` fills a `RobotJointAction` with PD gains and feedforward torques.
+     - `robotInterface.applyJointAction()` publishes the new joint actions to the simulation thread.
+
+---
+
 ## Centroidal MPC + MuJoCo
 
 The centroidal MPC example reuses the same MuJoCo backend and robot abstractions, but solves a reduced‑order centroidal OCP and then maps its output back to joint‑space torques.
@@ -102,44 +140,6 @@ See [`humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointControl
       - Applies a stabilizing PD toward zero position/velocity with smaller gains.
 - Before any MPC policy is available:
   - The controller uses a weight‑compensation input computed from the centroidal model and Pinocchio, then maps it to feed‑forward torques via the same `computeJointTorques` helper.
-
----
-
-## Whole‑Body MPC + MuJoCo
-
-### Simulation Entrypoint: `WBMpcRobotSim`
-
-File: [`humanoid_nmpc/humanoid_wb_mpc_ros2/src/WBMpcRobotSim.cpp`](../humanoid_nmpc/humanoid_wb_mpc_ros2/src/WBMpcRobotSim.cpp)
-
-- Command‑line arguments:
-  - `robotName`, `taskFile`, `referenceFile`, `urdfFile`, `gaitFile`, `mjxFile`.
-  - `urdfFile` is the robot description used by both MPC and `RobotDescription`.
-  - `mjxFile` is the MuJoCo scene/model file (`MujocoSimConfig::scenePath`).
-- MPC stack:
-  - Builds `WBMpcInterface` from the task and reference files.
-  - Instantiates `SqpMpc` and sets up reference managers and ROS 2 visualization.
-- Initial state for simulation:
-  - Builds a `RobotDescription` and `RobotState` from `urdfFile`.
-  - Uses the MPC robot model (`interface.getMpcRobotModel()`) to:
-    - Set the base position from the OCS2 initial state.
-    - Populate joint angles for the MPC model joints.
-- MuJoCo interface:
-  - Fills a `robot::mujoco_sim_interface::MujocoSimConfig` with:
-    - `scenePath = mjxFile`.
-    - `initStatePtr_` pointing to the initialized `RobotState`.
-    - `dt` and `verbose` as desired.
-  - Constructs `MujocoSimInterface robotInterface(config, urdfFile)`.
-  - Creates `WBMpcMrtJointController` with:
-    - The same `RobotDescription` used by MuJoCo.
-    - MPC model settings and Pinocchio interface.
-- Runtime loop:
-  1. `robotInterface.initSim()` performs one MuJoCo step and optionally starts rendering.
-  2. `mpcJointController.startMpcThread(robotInterface.getRobotState())` spawns the MPC thread.
-  3. After the first MPC policy is received, `robotInterface.startSim()` starts the MuJoCo sim thread.
-  4. The main loop runs at `mrtDeltaTMicroSeconds_` (here hard‑coded to 500 Hz):
-     - `robotInterface.updateInterfaceStateFromRobot()` copies the internal MuJoCo state into the public `RobotState`.
-     - `mpcJointController.computeJointControlAction(...)` fills a `RobotJointAction` with PD gains and feedforward torques.
-     - `robotInterface.applyJointAction()` publishes the new joint actions to the simulation thread.
 
 ---
 
