@@ -22,7 +22,11 @@ The **whole-body dynamics** MPC optimized over the contact forces and joint acce
 
 ### Robot Example
 
-The project supports [Unitree G1](https://www.unitree.com/g1) robot model.
+This repository supports [Unitree G1](https://www.unitree.com/g1) robot model.
+
+### Simulation
+
+This repository provides two simulation interfaces: `mujoco-sim` and `dummy-sim`.
 
 ## Get Started
 
