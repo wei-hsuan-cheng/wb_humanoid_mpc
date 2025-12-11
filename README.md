@@ -130,7 +130,7 @@ colcon build --symlink-install --packages-select \
 ## Running the examples
 Once you run the NMPC a window with Rviz will appear for visualization. The first time you start the MPC for a certain robot model the auto differentiation code will be generated which might take up to **5-15 min** depending on your system. Once done the robot appears and you can control it via an xbox gamepad or the controls in the terminal. 
 
-On the top level folder run:
+On the top level folder, run examples from [`Makefile`](./Makefile):
 
 For the **Centroidal Dynamics MPC**
 
