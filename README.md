@@ -2,7 +2,7 @@
 
 **Forked from [`manumerous/wb_humanoid_mpc`](https://github.com/manumerous/wb_humanoid_mpc) with some bugs fixed.**
 
-This repository contains a **torque-controlled Whole-Body Nonlinear Model Predictive Controller (NMPC)** for humanoid loco-manipulation control. The MPC model and solvers are built up on [OCS2](https://github.com/leggedrobotics/ocs2), a powerful optimal control platform. The codes are successfully tested in `ros2 humble`.
+This repository contains a **torque-controlled Whole-Body Nonlinear Model Predictive Controller (NMPC)** for humanoid loco-manipulation control. The MPC model and solvers are built up on [`leggedrobotics/ocs2`](https://github.com/leggedrobotics/ocs2), a powerful optimal control platform. The codes are successfully tested in [`ros2 humble`](https://docs.ros.org/en/humble/index.html).
 
 ### Interactive Velocity and Base Height Control via GUI & Joystick
 
@@ -12,7 +12,7 @@ This repository contains a **torque-controlled Whole-Body Nonlinear Model Predic
 
 ## MPC Formulations
 
-This repo contains examples for two MPC formulations: **centroidal dynamics (hierarchical) vs. whole-body dynamics**.
+This repository contains examples for two MPC formulations: **centroidal dynamics (hierarchical) vs. whole-body dynamics**.
 
 ### Centroidal Dynamics MPC
 The centroidal MPC optimizes over the **whole-body kinematics** and the center of mass dynamics, with a choice to either use a single rigid body model or the full centroidal dynamics. This specific approach builds up on the centroidal model in ocs2 by generalizing costs and constraints to a 6-DoF contact among others. A conscise explanation of the ocs2 centroidal model can be found in [Sleiman et. al., A Unified MPC Framework for Whole-Body Dynamic Locomotion and Manipulation](https://arxiv.org/abs/2103.00946).
@@ -20,7 +20,7 @@ The centroidal MPC optimizes over the **whole-body kinematics** and the center o
 ### Whole-Body Dynamics MPC
 The **whole-body dynamics** MPC optimized over the contact forces and joint accelerations with the option to compute the joint torques for each step planned accross the horizon. The most relevant information on the choosen approach can currently be found in [Galliker et al., Bipedal Locomotion with Nonlinear Model Predictive Control: Online Gait Generation using Whole-Body Dynamics](http://ames.caltech.edu/galliker2022bipedal.pdf).
 
-### Robot Examples
+### Robot Example
 
 The project supports [Unitree G1](https://www.unitree.com/g1) robot model.
 
@@ -40,13 +40,13 @@ git clone https://github.com/wei-hsuan-cheng/wb_humanoid_mpc.git -b humble
 
 This repository includes two helper scripts. Run them sequentially.
 
-- `image_build.bash` builds the `wb-humanoid-mpc:humble` Docker image with building arguments specified inside. 
+- [`image_build.bash`](./docker/image_build.bash) builds the `wb-humanoid-mpc:humble` Docker image with building arguments specified inside. 
    ```bash
    cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
    ./image_build.bash
    ```
 
-- `launch_wb_mpc.bash` starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code.
+- [`launch_wb_mpc.bash`](./docker/launch_wb_mpc.bash) starts the Docker container, mounts your workspace, and drops you into a bash shell ready to build and run the WB Humanoid MPC code.
    ```bash
    cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc/docker
    ./launch_wb_mpc.bash
@@ -55,7 +55,7 @@ This repository includes two helper scripts. Run them sequentially.
 
 ### Building the MPC 
 
-Building the WB MPC consumes a significant amount of RAM. We recommend saving all open work before starting the first build. The RAM usage can be adjusted by setting the PARALLEL_JOBS environment variable. Our recommendation is:
+Building the WB MPC consumes a significant amount of RAM. We recommend saving all open work before starting the first build. The RAM usage can be adjusted by setting the `PARALLEL_JOBS` environment variable. Our recommendation is:
 
 | PARALLEL_JOBS | Required System RAM |
 |--------------:|--------------------:|
@@ -64,7 +64,7 @@ Building the WB MPC consumes a significant amount of RAM. We recommend saving al
 | 6             |  64 GiB             | 
 
 
-Build all required pkgs from a helper script `Makefile`:
+Build all required pkgs from a helper script [`Makefile`](./Makefile):
 ```bash
 cd /path/to/humanoid_mpc_ws/src/wb_humanoid_mpc
 make build-all PARALLEL_JOBS=1
