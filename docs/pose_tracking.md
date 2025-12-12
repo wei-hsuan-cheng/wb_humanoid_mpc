@@ -81,6 +81,17 @@ Effectively, centroidal MPC tracks torso pose and joint posture in **state space
 - Block `Q_final`:
   - Same indexing, for terminal pose tracking weights.
 
+The corresponding `R` block is **not** a pose cost but shapes how “hard” the controller works:
+
+- `R(0..11,0..11)` penalize contact wrenches (feet forces/moments).
+- `R(12..34,12..34)` penalize joint velocities, limiting how fast joints move while tracking the desired pose.
+
+**Where this is wired in code:**
+
+- [`CentroidalMpcInterface::setupOptimalControlProblem`](../humanoid_nmpc/humanoid_centroidal_mpc/src/CentroidalMpcInterface.cpp) calls
+  `HumanoidCostConstraintFactory::getStateInputQuadraticCost`, which reads `Q`, `R`, and `Q_final` from
+  `g1_centroidal_mpc/config/mpc/task.info` and builds the quadratic state–input cost that drives base and joint pose tracking.
+
 ### Foot Task‑Space Tracking (Centroidal)
 
 In `CentroidalMpcInterface::setupOptimalControlProblem`:

@@ -177,9 +177,9 @@ Q
   (5,5)   4.0      ; L_z / robotMass
 
   ;; Base Pose: [position, orientation] ;;
-  (6,6)   0.0    ; p_base_x
-  (7,7)   0.0    ; p_base_y
-  (8,8)   15.0    ; p_base_z
+  (6,6)   15.0    ; p_base_x // 0.0
+  (7,7)   15.0    ; p_base_y // 0.0
+  (8,8)   15.0    ; p_base_z // 15.0
   ; euler angles for base to world rotation
   (9,9)   0.0    ; theta_base_z
   (10,10) 5.0    ; theta_base_y
