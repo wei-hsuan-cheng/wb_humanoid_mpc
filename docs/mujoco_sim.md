@@ -77,7 +77,7 @@ File: [`humanoid_nmpc/humanoid_centroidal_mpc_ros2/src/CentroidalMpcRobotSim.cpp
   - Builds a `CentroidalMpcInterface` from the task and reference files ([`humanoid_nmpc/humanoid_centroidal_mpc/src/CentroidalMpcInterface.cpp`](../humanoid_nmpc/humanoid_centroidal_mpc/src/CentroidalMpcInterface.cpp)).
   - Instantiates `SqpMpc` for the centroidal OCP.
   - Sets up the same `Ros2ProceduralMpcMotionManager` and `HumanoidVisualizer` as in the whole‑body case, but using the centroidal robot model and centroidal model info.
-- Centroidal model (see also `docs/g1_centroidal_mpc_notes.md`):
+- Centroidal model (see also `docs/g1_centroidal_mpc.md`):
   - State includes normalized centroidal momentum, base pose (position + ZYX orientation), and MPC‑active joint angles.
   - Input includes foot contact wrenches and joint velocities.
   - Dynamics, costs, and constraints are configured via the centroidal MPC task file and `CentroidalMpcInterface`.
@@ -120,7 +120,7 @@ See [`humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointControl
     - Base pose and twist into the centroidal state layout (normalized centroidal momentum, base position/orientation).
     - Joint positions/velocities for `mpcJointIndices_` into the joint part of the state.
     - Contact flags from `RobotState::getContactFlags()` into the mode/phase definition used by the centroidal OCP.
-  - This logic is summarized (with code pointers and math) in `docs/g1_centroidal_mpc_notes.md` under “Observation”.
+  - This logic is summarized (with code pointers and math) in `docs/g1_centroidal_mpc.md` under “Observation”.
 - MPC policy evaluation and torque synthesis:
   - Once a policy is available (`CentroidalMpcMrtJointController::updateJointController`):
     - The controller evaluates the centroidal policy to obtain desired joint positions/velocities and foot contact wrenches.
