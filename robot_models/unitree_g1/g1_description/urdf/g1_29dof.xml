@@ -1,6 +1,6 @@
 <mujoco model="g1_29dof">
   <default>
-    <geom friction="3.0 0.1 0.001" solimp="0.999 0.95 0.005" solref="0.001 1.0"/>
+    <geom friction="0.4 0.1 0.001" solimp="0.999 0.95 0.005" solref="0.001 1.0"/>
   </default>
   <compiler angle="radian" meshdir="../meshes"/>
 
