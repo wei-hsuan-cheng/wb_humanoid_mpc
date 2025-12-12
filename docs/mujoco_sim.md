@@ -238,6 +238,9 @@ File: [`robot_runtime/robot_model/include/robot_model/RobotJointAction.h`](../ro
   - Feedforward torque `feed_forward_effort`.
 - Effective torque:
   - `getTotalFeedbackTorque(q, qd)` returns `kp * (q_des - q) + kd * (qd_des - qd) + feed_forward_effort`.
+  $$
+      \tau_{motor} = \tau_{ff} + K_p(q^* - q) + K_d(\dot{q}^* - \dot{q})
+  $$
 
 Simulation loop (`MujocoSimInterface::simulationStep`, `MujocoSimInterface.cpp:357-387`):
 
