@@ -336,7 +336,7 @@ The environment for the humanoid sim is defined directly in the MuJoCo XML (`g1_
 
 - Global contact/friction settings:
   - A default geom element (`<default>`) sets friction and contact solver parameters:
-    - `friction="3.0 0.1 0.001"` (tangential, torsional, rolling).
+    - `friction="0.8 0.1 0.001"` (tangential, torsional, rolling).
     - `solimp` and `solref` define the contact impedance and restitution.
 - Ground plane:
   - Under `<worldbody>`:
