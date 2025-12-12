@@ -6,6 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1/Description Topic1
+        - /TF1
+        - /TF1/Frames1
         - /Cartesian Markers1/Namespaces1
       Splitter Ratio: 0.5
     Tree Height: 733
@@ -259,8 +261,6 @@ Visualization Manager:
       Visual Enabled: true
     - Class: rviz_default_plugins/TF
       Enabled: true
-      Filter (blacklist): ""
-      Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: false
@@ -275,7 +275,7 @@ Visualization Manager:
         left_ankle_pitch_link:
           Value: false
         left_ankle_roll_link:
-          Value: false
+          Value: true
         left_elbow_link:
           Value: false
         left_hip_pitch_link:
@@ -287,7 +287,7 @@ Visualization Manager:
         left_knee_link:
           Value: false
         left_rubber_hand:
-          Value: false
+          Value: true
         left_shoulder_pitch_link:
           Value: false
         left_shoulder_roll_link:
@@ -303,7 +303,7 @@ Visualization Manager:
         logo_link:
           Value: false
         mid360_link:
-          Value: false
+          Value: true
         pelvis:
           Value: true
         pelvis_contour_link:
@@ -311,7 +311,7 @@ Visualization Manager:
         right_ankle_pitch_link:
           Value: false
         right_ankle_roll_link:
-          Value: false
+          Value: true
         right_elbow_link:
           Value: false
         right_hip_pitch_link:
@@ -323,7 +323,7 @@ Visualization Manager:
         right_knee_link:
           Value: false
         right_rubber_hand:
-          Value: false
+          Value: true
         right_shoulder_pitch_link:
           Value: false
         right_shoulder_roll_link:
@@ -675,8 +675,6 @@ Visualization Manager:
       Enabled: true
       Name: Cartesian Markers
       Namespaces:
-        Center of Pressure: true
-        EE Forces: true
         equivalentContactCornerForces: false
       Topic:
         Depth: 5
