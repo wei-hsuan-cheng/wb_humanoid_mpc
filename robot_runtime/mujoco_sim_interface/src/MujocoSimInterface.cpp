@@ -164,6 +164,36 @@ void MujocoSimInterface::copyMjState(MjState& state) const {
 /******************************************************************************************************/
 /******************************************************************************************************/
 
+void MujocoSimInterface::requestExternalForce(int bodyId, const Eigen::Matrix<double, 6, 1>& wrench, double durationSec) const {
+  if (durationSec <= 0.0) {
+    return;
+  }
+
+  // Body id must be valid and non-world (world is id 0).
+  if (bodyId < 1 || bodyId >= mujocoModel_->nbody) {
+    std::cerr << "requestExternalForce: invalid body id " << bodyId << std::endl;
+    return;
+  }
+
+  double currentTime = 0.0;
+  {
+    // Grab the latest sim time safely.
+    std::lock_guard<std::mutex> guard(mujocoMutex_);
+    currentTime = mujocoData_->time;
+  }
+
+  std::lock_guard<std::mutex> pushGuard(pushMutex_);
+  pendingPush_.bodyId = bodyId;
+  for (int i = 0; i < 6; ++i) {
+    pendingPush_.wrench[i] = wrench[i];
+  }
+  pendingPush_.endTime = currentTime + durationSec;
+}
+
+/******************************************************************************************************/
+/******************************************************************************************************/
+/******************************************************************************************************/
+
 void MujocoSimInterface::setupJointIndexMaps() {
   // Mujoco to Robot joints
   for (int i = 1; i < mujocoModel_->njnt; ++i) {
@@ -363,7 +393,27 @@ void MujocoSimInterface::simulationStep() {
         jointAction.getTotalFeedbackTorque(robotStateInternal_.getJointPosition(idx), robotStateInternal_.getJointVelocity(idx));
   }
 
+  bool didReset = false;
+
   mujocoMutex_.lock();
+
+  // Clear any previous external forces and apply a pending push if requested.
+  mju_zero(mujocoData_->xfrc_applied, 6 * mujocoModel_->nbody);
+  {
+    std::lock_guard<std::mutex> pushGuard(pushMutex_);
+    if (pendingPush_.bodyId >= 0 && mujocoData_->time < pendingPush_.endTime) {
+      for (int i = 0; i < 6; ++i) {
+        mujocoData_->xfrc_applied[6 * pendingPush_.bodyId + i] = pendingPush_.wrench[i];
+      }
+    } else if (pendingPush_.bodyId >= 0 && mujocoData_->time >= pendingPush_.endTime) {
+      pendingPush_.bodyId = -1;
+      pendingPush_.endTime = 0.0;
+      for (int i = 0; i < 6; ++i) {
+        pendingPush_.wrench[i] = 0.0;
+      }
+    }
+  }
+
   mj_step(mujocoModel_, mujocoData_);
   updateThreadSafeRobotState();
   updateMetrics();
@@ -379,11 +429,14 @@ void MujocoSimInterface::simulationStep() {
     simFps_.reset();
     metrics_.reset();
     updateMetrics();
-    mujocoMutex_.unlock();
+    didReset = true;
+  }
+  mujocoMutex_.unlock();
+
+  if (didReset) {
     // Sleep to let controller update and adjust;
     std::this_thread::sleep_until(std::chrono::steady_clock::now() + std::chrono::microseconds(1000000));
   }
-  mujocoMutex_.unlock();
 }
 
 /******************************************************************************************************/

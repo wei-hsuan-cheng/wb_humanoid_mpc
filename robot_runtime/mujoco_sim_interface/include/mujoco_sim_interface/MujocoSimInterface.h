@@ -85,7 +85,16 @@ class MujocoSimInterface : public robot::model::RobotHWInterfaceBase {
 
   const MujocoSimConfig& getConfig() const { return config_; }
 
+  // Request an external wrench (fx, fy, fz, tx, ty, tz) on a body for a short duration.
+  void requestExternalForce(int bodyId, const Eigen::Matrix<double, 6, 1>& wrench, double durationSec) const;
+
  private:
+  struct PendingPush {
+    int bodyId{-1};
+    mjtNum wrench[6]{};
+    double endTime{0.0};
+  };
+
   void setupJointIndexMaps();
 
   void setSimState(const model::RobotState& robotState);
@@ -124,6 +133,9 @@ class MujocoSimInterface : public robot::model::RobotHWInterfaceBase {
   const bool verbose_;
   std::atomic<bool> terminate_{false};
   std::atomic<bool> guiInitialized_{false};
+
+  mutable std::mutex pushMutex_;  // Protects pendingPush_ access across threads.
+  mutable PendingPush pendingPush_;
 
   mutable std::mutex mujocoMutex_;  // Used to access mujoco model and data accross simulation and render threads.
   std::thread simulate_thread_;

@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <thread>
 
+#include <Eigen/Dense>
+
 #include "mujoco_sim_interface/MujocoSimInterface.h"
 
 namespace robot::mujoco_sim_interface {
@@ -97,7 +99,52 @@ void MujocoRenderer::keyboard(GLFWwindow* window, int key, int, int act, int mod
               << "m => toggle center of mass visualization\n"
               << "t => toggle model transparency\n"
               << "i => toggle interia visualization\n"
-              << "h => toggle hull visualization\n";
+              << "h => toggle hull visualization\n"
+              << "w/a/s/d => apply push disturbance (forward/left/backward/right)\n";
+  }
+
+  // 'w', 'a', 's', 'd' keys: apply directional push disturbance on torso (or first non-world body)
+  if (act == GLFW_PRESS && (key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_S || key == GLFW_KEY_D)) {
+    int bodyId = mj_name2id(renderer->simInterface_->getModel(), mjOBJ_BODY, "torso");
+    if (bodyId < 1) {
+      bodyId = mj_name2id(renderer->simInterface_->getModel(), mjOBJ_BODY, "pelvis");
+    }
+    if (bodyId < 1 && renderer->simInterface_->getModel()->nbody > 1) {
+      bodyId = 1;  // fallback to first body after world
+    }
+
+    if (bodyId >= 1) {
+      Eigen::Matrix<double, 6, 1> wrench;
+      const double pushForce = 100.0;   // [N]
+      const double pushDuration = 0.15;  // [s]
+      std::string direction;
+
+      switch (key) {
+        case GLFW_KEY_W:  // forward (+x)
+          wrench << pushForce, 0.0, 0.0, 0.0, 0.0, 0.0;
+          direction = "forward";
+          break;
+        case GLFW_KEY_S:  // backward (-x)
+          wrench << -pushForce, 0.0, 0.0, 0.0, 0.0, 0.0;
+          direction = "backward";
+          break;
+        case GLFW_KEY_A:  // left (+y)
+          wrench << 0.0, pushForce, 0.0, 0.0, 0.0, 0.0;
+          direction = "left";
+          break;
+        case GLFW_KEY_D:  // right (-y)
+        default:
+          wrench << 0.0, -pushForce, 0.0, 0.0, 0.0, 0.0;
+          direction = "right";
+          break;
+      }
+
+      renderer->simInterface_->requestExternalForce(bodyId, wrench, pushDuration);
+      std::cerr << "Applied " << direction << " push to body id " << bodyId << " with wrench [" << wrench.transpose() << "]"
+                << std::endl;
+    } else {
+      std::cerr << "Could not find a valid body for disturbance (checked torso/pelvis)." << std::endl;
+    }
   }
 }
 
