@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -90,6 +91,12 @@ class MujocoRenderer {
   // Cleanup must occur in same thread that owns the opengl context.
   void cleanup();
 
+  // Push disturbance helpers
+  void initializePushBodies();
+  int getCurrentPushBodyId() const;
+  std::string getCurrentPushBodyName() const;
+  void cyclePushBody();
+
   const MujocoSimInterface* simInterface_;
   MjState simState_;
 
@@ -111,6 +118,16 @@ class MujocoRenderer {
 
   double lastclicktm = 0;
   bool model_transparent = false;
+
+  // Push disturbance configuration
+  std::vector<std::string> pushBodyNames_;
+  int currentPushBodyIndex_{0};
+  double pushForce_{50.0};      // [N]
+  double pushDuration_{0.25};   // [s]
+
+  // External wrench visualization parameters
+  double arrowLengthScale_{0.5};
+  double arrowWidth_{0.01};
 
   // Mujoco visualization structures
   mjvCamera mujocoCam_;       // abstract camera

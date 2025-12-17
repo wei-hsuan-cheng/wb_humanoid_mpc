@@ -100,50 +100,135 @@ void MujocoRenderer::keyboard(GLFWwindow* window, int key, int, int act, int mod
               << "t => toggle model transparency\n"
               << "i => toggle interia visualization\n"
               << "h => toggle hull visualization\n"
-              << "w/a/s/d => apply push disturbance (forward/left/backward/right)\n";
+              << "q => cycle push frame (e.g. pelvis / torso_link / left_shoulder_roll_link / left_wrist_roll_link / right_shoulder_roll_link / right_wrist_roll_link)\n"
+              << "UP/DOWN => increase/decrease push force\n"
+              << "LEFT/RIGHT => decrease/increase push duration\n"
+              << "SHIFT+UP/DOWN => increase/decrease push arrow length\n"
+              << "SHIFT+LEFT/RIGHT => decrease/increase push arrow width\n"
+              << "w/a/s/d => apply push disturbance (forward / left / backward / right)\n";
   }
 
-  // 'w', 'a', 's', 'd' keys: apply directional push disturbance on torso (or first non-world body)
-  if (act == GLFW_PRESS && (key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_S || key == GLFW_KEY_D)) {
-    int bodyId = mj_name2id(renderer->simInterface_->getModel(), mjOBJ_BODY, "torso");
-    if (bodyId < 1) {
-      bodyId = mj_name2id(renderer->simInterface_->getModel(), mjOBJ_BODY, "pelvis");
-    }
-    if (bodyId < 1 && renderer->simInterface_->getModel()->nbody > 1) {
-      bodyId = 1;  // fallback to first body after world
-    }
+  // 'q' key: cycle push frame (body where wrench is applied)
+  if (act == GLFW_PRESS && key == GLFW_KEY_Q) {
+    renderer->cyclePushBody();
+    int bodyId = renderer->getCurrentPushBodyId();
+    const std::string bodyName = renderer->getCurrentPushBodyName();
 
     if (bodyId >= 1) {
-      Eigen::Matrix<double, 6, 1> wrench;
-      const double pushForce = 100.0;   // [N]
-      const double pushDuration = 0.15;  // [s]
+      std::cerr << "Push frame switched to body '" << bodyName << "' (id " << bodyId << ")" << std::endl;
+    } else {
+      std::cerr << "No valid body found for push frame." << std::endl;
+    }
+  }
+
+  // Arrow keys (without modifiers): adjust push parameters
+  if (act == GLFW_PRESS && (mods == 0) && (key == GLFW_KEY_UP || key == GLFW_KEY_DOWN)) {
+    const double deltaForce = 25.0;  // [N]
+    if (key == GLFW_KEY_UP) {
+      renderer->pushForce_ += deltaForce;
+    } else {
+      renderer->pushForce_ -= deltaForce;
+      if (renderer->pushForce_ < 0.0) {
+        renderer->pushForce_ = 0.0;
+      }
+    }
+    std::cerr << "Push force set to " << renderer->pushForce_ << " [N]" << std::endl;
+  }
+
+  if (act == GLFW_PRESS && (mods == 0) && (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT)) {
+    const double deltaDuration = 0.05;  // [s]
+    if (key == GLFW_KEY_RIGHT) {
+      renderer->pushDuration_ += deltaDuration;
+    } else {
+      renderer->pushDuration_ -= deltaDuration;
+      if (renderer->pushDuration_ < 0.0) {
+        renderer->pushDuration_ = 0.0;
+      }
+    }
+    std::cerr << "Push duration set to " << renderer->pushDuration_ << " [s]" << std::endl;
+  }
+
+  // Arrow keys with SHIFT: adjust visualization of the push arrow.
+  if (act == GLFW_PRESS && (mods & GLFW_MOD_SHIFT) && (key == GLFW_KEY_UP || key == GLFW_KEY_DOWN)) {
+    const double deltaScale = 0.1;
+    if (key == GLFW_KEY_UP) {
+      renderer->arrowLengthScale_ += deltaScale;
+    } else {
+      renderer->arrowLengthScale_ -= deltaScale;
+      if (renderer->arrowLengthScale_ < 0.1) {
+        renderer->arrowLengthScale_ = 0.1;
+      }
+    }
+    std::cerr << "Push arrow length scale set to " << renderer->arrowLengthScale_ << std::endl;
+  }
+
+  if (act == GLFW_PRESS && (mods & GLFW_MOD_SHIFT) && (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT)) {
+    const double deltaWidth = 0.001;
+    if (key == GLFW_KEY_RIGHT) {
+      renderer->arrowWidth_ += deltaWidth;
+    } else {
+      renderer->arrowWidth_ -= deltaWidth;
+      if (renderer->arrowWidth_ < 1e-4) {
+        renderer->arrowWidth_ = 1e-4;
+      }
+    }
+    std::cerr << "Push arrow width set to " << renderer->arrowWidth_ << std::endl;
+  }
+
+  // 'w', 'a', 's', 'd' keys: apply directional push disturbance on selected body
+  // Directions are defined in the body frame of the selected body and then
+  // rotated into the world frame for MuJoCo.
+  if (act == GLFW_PRESS && (key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_S || key == GLFW_KEY_D)) {
+    int bodyId = renderer->getCurrentPushBodyId();
+    const std::string bodyName = renderer->getCurrentPushBodyName();
+
+    if (bodyId >= 1) {
+      Eigen::Matrix<double, 6, 1> wrenchWorld;
+      const double pushForce = renderer->pushForce_;        // [N]
+      const double pushDuration = renderer->pushDuration_;  // [s]
       std::string direction;
 
+      // Force in body frame (x-forward, y-left) of the selected body.
+      Eigen::Vector3d forceBody(0.0, 0.0, 0.0);
       switch (key) {
-        case GLFW_KEY_W:  // forward (+x)
-          wrench << pushForce, 0.0, 0.0, 0.0, 0.0, 0.0;
-          direction = "forward";
+        case GLFW_KEY_W:  // forward (+x body)
+          forceBody << pushForce, 0.0, 0.0;
+          direction = "forward (body +x)";
           break;
-        case GLFW_KEY_S:  // backward (-x)
-          wrench << -pushForce, 0.0, 0.0, 0.0, 0.0, 0.0;
-          direction = "backward";
+        case GLFW_KEY_S:  // backward (-x body)
+          forceBody << -pushForce, 0.0, 0.0;
+          direction = "backward (body -x)";
           break;
-        case GLFW_KEY_A:  // left (+y)
-          wrench << 0.0, pushForce, 0.0, 0.0, 0.0, 0.0;
-          direction = "left";
+        case GLFW_KEY_A:  // left (+y body)
+          forceBody << 0.0, pushForce, 0.0;
+          direction = "left (body +y)";
           break;
-        case GLFW_KEY_D:  // right (-y)
+        case GLFW_KEY_D:  // right (-y body)
         default:
-          wrench << 0.0, -pushForce, 0.0, 0.0, 0.0, 0.0;
-          direction = "right";
+          forceBody << 0.0, -pushForce, 0.0;
+          direction = "right (body -y)";
           break;
       }
 
-      renderer->simInterface_->requestExternalForce(bodyId, wrench, pushDuration);
-      std::cerr << "Applied " << direction << " push to body id " << bodyId << " with wrench [" << wrench.transpose() << "]"
-                << std::endl;
+      // Rotate force into world frame using the current body orientation.
+      Eigen::Vector3d forceWorld = forceBody;
+      auto* model = renderer->simInterface_->getModel();
+      auto* data = renderer->simState_.data;
+      if (model && data && bodyId >= 1 && bodyId < model->nbody) {
+        const mjtNum* xmat = data->xmat + 9 * bodyId;
+        Eigen::Matrix3d R;
+        R << xmat[0], xmat[1], xmat[2], xmat[3], xmat[4], xmat[5], xmat[6], xmat[7], xmat[8];
+        forceWorld = R * forceBody;
+      }
+
+      wrenchWorld << forceWorld.x(), forceWorld.y(), forceWorld.z(), 0.0, 0.0, 0.0;
+
+      renderer->simInterface_->requestExternalForce(bodyId, wrenchWorld, pushDuration);
+      std::cerr << "Applied " << direction << " push to body '" << bodyName << "' (id " << bodyId
+                << ") with world-frame wrench [" << wrenchWorld.transpose() << "], |F_body| " << forceBody.norm()
+                << " [N], duration " << pushDuration << " [s]" << std::endl;
     } else {
-      std::cerr << "Could not find a valid body for disturbance (checked torso/pelvis)." << std::endl;
+      std::cerr << "Could not find a valid body for disturbance." << std::endl;
     }
   }
 }
@@ -207,6 +292,8 @@ MujocoRenderer::MujocoRenderer(const MujocoSimInterface* simInterface)
       timeStepMicro_(1e6 / simInterface_->getConfig().renderFrequencyHz) {
   mujocoScene_.flags[mjRND_SHADOW] = 1;
   mujocoScene_.flags[mjRND_REFLECTION] = 1;
+
+  initializePushBodies();
 }
 
 MujocoRenderer::~MujocoRenderer() {
@@ -235,6 +322,83 @@ void MujocoRenderer::waitForInit() const {
 void MujocoRenderer::setTransparency(float transparency) const {
   for (int i = 0; i < simInterface_->getModel()->ngeom; i++) {
     simInterface_->getModel()->geom_rgba[4 * i + 3] = transparency;
+  }
+}
+
+void MujocoRenderer::initializePushBodies() {
+  const auto* model = simInterface_->getModel();
+  if (!model) {
+    return;
+  }
+
+  // Candidate body names to apply pushes to. Only bodies that exist in the
+  // current model will be kept.
+  std::vector<std::string> candidateNames = {"pelvis", "torso_link", "left_shoulder_roll_link", "left_wrist_roll_link" , "right_shoulder_roll_link", "right_wrist_roll_link"};
+
+  pushBodyNames_.clear();
+  for (const auto& name : candidateNames) {
+    int bodyId = mj_name2id(model, mjOBJ_BODY, name.c_str());
+    if (bodyId >= 1) {
+      pushBodyNames_.push_back(name);
+    }
+  }
+
+  // Fallback: use first non-world body if nothing matched.
+  if (pushBodyNames_.empty() && model->nbody > 1) {
+    const char* fallbackName = mj_id2name(model, mjOBJ_BODY, 1);
+    if (fallbackName && fallbackName[0] != '\0') {
+      pushBodyNames_.emplace_back(fallbackName);
+    }
+  }
+
+  currentPushBodyIndex_ = 0;
+}
+
+int MujocoRenderer::getCurrentPushBodyId() const {
+  const auto* model = simInterface_->getModel();
+  if (!model) {
+    return -1;
+  }
+
+  if (!pushBodyNames_.empty()) {
+    const auto& name = pushBodyNames_[currentPushBodyIndex_];
+    int bodyId = mj_name2id(model, mjOBJ_BODY, name.c_str());
+    if (bodyId >= 1) {
+      return bodyId;
+    }
+  }
+
+  // Fallback: first body after world if available.
+  if (model->nbody > 1) {
+    return 1;
+  }
+
+  return -1;
+}
+
+std::string MujocoRenderer::getCurrentPushBodyName() const {
+  if (!pushBodyNames_.empty()) {
+    return pushBodyNames_[currentPushBodyIndex_];
+  }
+
+  const auto* model = simInterface_->getModel();
+  if (model && model->nbody > 1) {
+    const char* name = mj_id2name(model, mjOBJ_BODY, 1);
+    if (name) {
+      return std::string{name};
+    }
+  }
+
+  return std::string{"<unknown>"};
+}
+
+void MujocoRenderer::cyclePushBody() {
+  if (pushBodyNames_.empty()) {
+    initializePushBodies();
+  }
+
+  if (!pushBodyNames_.empty()) {
+    currentPushBodyIndex_ = (currentPushBodyIndex_ + 1) % static_cast<int>(pushBodyNames_.size());
   }
 }
 
@@ -294,10 +458,11 @@ void MujocoRenderer::renderExternalForces() {
     std::memset(arrow, 0, sizeof(mjvGeom));
 
     // Scale factor that grows with force magnitude
-    // Adjust these constants to tune the visualization
+    // Adjust these constants to tune the visualization.
+    // The user-controllable arrowLengthScale_ scales the overall length.
     const double base_scale = 0.1;    // Minimum arrow length
     const double force_scale = 0.05;  // How much to scale with force
-    const double scale = base_scale + force_scale * magnitude;
+    const double scale = arrowLengthScale_ * (base_scale + force_scale * magnitude);
 
     // Calculate arrow end point using normalized force direction and scale
     double end_x = xpos[0] + scale * (fx / magnitude);
@@ -309,14 +474,14 @@ void MujocoRenderer::renderExternalForces() {
 
     mjv_connector(arrow,         // geom to write to
                   mjGEOM_ARROW,  // type (arrow)
-                  0.005,         // width (thin arrows)
+                  arrowWidth_,   // width (user-adjustable)
                   from,          // from position
                   to             // to position
     );
 
-    // Set color
-    arrow->rgba[0] = 0.5f;
-    arrow->rgba[1] = 1.0f;
+    // Set color for external wrench arrow (bright red)
+    arrow->rgba[0] = 1.0f;
+    arrow->rgba[1] = 0.0f;
     arrow->rgba[2] = 0.0f;
     arrow->rgba[3] = 1.0f;
 
