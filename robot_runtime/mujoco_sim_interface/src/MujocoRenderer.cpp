@@ -105,7 +105,7 @@ void MujocoRenderer::keyboard(GLFWwindow* window, int key, int, int act, int mod
               << "LEFT/RIGHT => decrease/increase push duration\n"
               << "SHIFT+UP/DOWN => increase/decrease push arrow length\n"
               << "SHIFT+LEFT/RIGHT => decrease/increase push arrow width\n"
-              << "w/a/s/d => apply push disturbance (forward / left / backward / right)\n";
+              << "w/a/s/d/z/x => apply push disturbance (forward / left / backward / right / up / down)\n";
   }
 
   // 'q' key: cycle push frame (body where wrench is applied)
@@ -175,10 +175,10 @@ void MujocoRenderer::keyboard(GLFWwindow* window, int key, int, int act, int mod
     std::cerr << "Push arrow width set to " << renderer->arrowWidth_ << std::endl;
   }
 
-  // 'w', 'a', 's', 'd' keys: apply directional push disturbance on selected body
+  // 'w', 'a', 's', 'd', 'z', 'x' keys: apply directional push disturbance on selected body
   // Directions are defined in the body frame of the selected body and then
   // rotated into the world frame for MuJoCo.
-  if (act == GLFW_PRESS && (key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_S || key == GLFW_KEY_D)) {
+  if (act == GLFW_PRESS && (key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_S || key == GLFW_KEY_D|| key == GLFW_KEY_Z|| key == GLFW_KEY_X)) {
     int bodyId = renderer->getCurrentPushBodyId();
     const std::string bodyName = renderer->getCurrentPushBodyName();
 
@@ -195,18 +195,31 @@ void MujocoRenderer::keyboard(GLFWwindow* window, int key, int, int act, int mod
           forceBody << pushForce, 0.0, 0.0;
           direction = "forward (body +x)";
           break;
+
         case GLFW_KEY_S:  // backward (-x body)
           forceBody << -pushForce, 0.0, 0.0;
           direction = "backward (body -x)";
           break;
+
         case GLFW_KEY_A:  // left (+y body)
           forceBody << 0.0, pushForce, 0.0;
           direction = "left (body +y)";
           break;
+        
         case GLFW_KEY_D:  // right (-y body)
-        default:
           forceBody << 0.0, -pushForce, 0.0;
           direction = "right (body -y)";
+          break;
+        
+        case GLFW_KEY_Z:  // up (+z body)
+          forceBody << 0.0, 0.0, pushForce;
+          direction = "up (body +z)";
+          break;
+        
+        case GLFW_KEY_X:  // down (-z body)
+        default:
+          forceBody << 0.0, 0.0, -pushForce;
+          direction = "down (body -z)";
           break;
       }
 
