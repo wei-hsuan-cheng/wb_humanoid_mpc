@@ -13,7 +13,7 @@ model_settings
 
   foot_constraint
   {
-    positionErrorGain_z             5.0
+    positionErrorGain_z             5.0 // 5.0
     orientationErrorGain            20.0
     linearVelocityErrorGain_z       1.0
     linearVelocityErrorGain_xy      1.0
@@ -273,7 +273,7 @@ Q_final
   ;; Base Pose: [position, orientation] ;;
   (6,6)   0.0    ; p_base_x
   (7,7)   0.0    ; p_base_y
-  (8,8)   20.0    ; p_base_z
+  (8,8)  20.0    ; p_base_z // 20.0
   ; euler angles for base to world rotation
   (9,9)   0.0    ; theta_base_z
   (10,10) 5.0    ; theta_base_y
