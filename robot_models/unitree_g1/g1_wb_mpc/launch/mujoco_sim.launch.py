@@ -12,7 +12,7 @@ def generate_launch_description():
         mpc_config_pkg="g1_wb_mpc",
         mpc_model_pkg="g1_description",
         urdf_rel_path="/urdf/g1_29dof.urdf",
-        xml_rel_path="/urdf/scene.xml",
+        xml_rel_path="/mujoco/scene.xml",
         robot_name="g1",
         solver="sqp",
         enable_debug=False,
