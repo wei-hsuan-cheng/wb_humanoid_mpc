@@ -2,7 +2,7 @@
   <include file="g1_29dof.xml"/>
   <!-- <include file="boxes.xml"/> -->
   <include file="stairs.xml"/>
-  <!-- <include file="slope.xml"/> -->
+  <include file="slope.xml"/>
 
   <statistic center="1.0 0.7 1.0" extent="0.8"/>
 
