@@ -11,7 +11,7 @@
       <geom name="step5" type="box" size="0.25 0.4 0.05" pos="2.0 0.0 0.25" rgba="0.6 0.6 0.6 1" friction="0.8 0.1 0.001"/> -->
 
       <!-- Test -->
-      <geom name="step1_low" type="box" size="1.0 1.6 0.01" pos="0.0 0.0 0.01" rgba="0.4 0.4 0.4 1" friction="0.8 0.1 0.001"/>
+      <geom name="step1_low" type="box" size="1.0 1.6 0.02" pos="0.0 0.0 0.03" rgba="0.4 0.4 0.4 1" friction="0.8 0.1 0.001"/>
       <!-- <geom name="step1_high" type="box" size="1.0 1.6 0.05" pos="0.0 0.0 0.05" rgba="0.4 0.4 0.4 1" friction="0.8 0.1 0.001"/> -->
     
     </body>
