@@ -22,19 +22,19 @@ We assume a floating–base robot model with:
     \end{bmatrix},
   $$
   where
-  - $$h_G$$ is centroidal momentum about the **true CoM**,
-  - $$q_b$$ is the floating–base (torso) pose,
-  - $$q_j$$ are joint angles.
+  - $h_G$ is centroidal momentum about the **true CoM**,
+  - $q_b$ is the floating–base (torso) pose,
+  - $q_j$ are joint angles.
 
 - Contact sequence / gait schedule: stance vs swing phases of feet.
 - A high–level command, e.g. desired torso velocity or pose.
 
 We distinguish *what is generated ahead of time* and fed as **reference trajectories** into MPC:
 
-- CoM reference $$c_{\text{des}}(t)$$,
-- torso/base reference $$(p_{b,\text{des}}(t), R_{b,\text{des}}(t))$$,
-- swing/stance foot references $$r_{\text{foot,des}}(t)$$,
-- possibly desired centroidal momentum $$h_G^{\text{des}}(t)$$.
+- CoM reference $c_{\text{des}}(t)$,
+- torso/base reference $(p_{b,\text{des}}(t), R_{b,\text{des}}(t))$,
+- swing/stance foot references $r_{\text{foot,des}}(t)$,
+- possibly desired centroidal momentum $h_G^{\text{des}}(t)$.
 
 ---
 
@@ -43,10 +43,10 @@ We distinguish *what is generated ahead of time* and fed as **reference trajecto
 **Idea.**  
 A separate high–level **pattern generator** computes *all* of the following:
 
-- CoM trajectory $$c_{\text{des}}(t)$$ (often via LIPM, SRBD, or linearized centroidal models),
-- torso/pelvis trajectory $$(p_{b,\text{des}}(t), R_{b,\text{des}}(t))$$,
-- swing foot trajectories $$r_{\text{foot,des}}(t)$$,
-- possibly nominal centroidal momentum $$h_G^{\text{des}}(t)$$.
+- CoM trajectory $c_{\text{des}}(t)$ (often via LIPM, SRBD, or linearized centroidal models),
+- torso/pelvis trajectory $(p_{b,\text{des}}(t), R_{b,\text{des}}(t))$,
+- swing foot trajectories $r_{\text{foot,des}}(t)$,
+- possibly nominal centroidal momentum $h_G^{\text{des}}(t)$.
 
 The pattern generator uses the **gait schedule** and the motion command (e.g. desired walking
 velocity) to ensure that:
@@ -89,9 +89,9 @@ $$
   c_{\text{des}}(t) = p_{b,\text{des}}(t) + R_{b,\text{des}}(t)\,d_0,
 $$
 
-where $$d_0$$ is a nominal torso→CoM offset measured from a standard standing pose.
+where $d_0$ is a nominal torso→CoM offset measured from a standard standing pose.
 
-Feet trajectories $$r_{\text{foot,des}}(t)$$ are generated via a gait module based on the same base
+Feet trajectories $r_{\text{foot,des}}(t)$ are generated via a gait module based on the same base
 motion and schedule, but the CoM is not separately planned by a full dynamic model; it is tied to
 the torso with a simple offset.
 
@@ -129,8 +129,8 @@ In this case:
   - torso/base tracking,
   - foot/swing tracking,
   - posture regularization,
-  - and **momentum regularization** (e.g. penalizing large $$h_G$$ or its components),
-- but **no explicit term** of the form $$\|c(q) - c_{\text{des}}(t)\|^2$$.
+  - and **momentum regularization** (e.g. penalizing large $h_G$ or its components),
+- but **no explicit term** of the form $\|c(q) - c_{\text{des}}(t)\|^2$.
 
 The CoM trajectory is then **implicit**:
 
@@ -157,7 +157,7 @@ The CoM trajectory is then **implicit**:
 - The **procedural motion manager + gait** generate base and feet references:
   - that part looks like a pattern–generator approach.
 - **However, CoM is not given its own reference trajectory**:
-  - CoM is computed from $$q_b, q_j$$ and appears only via dynamics and momentum costs.
+  - CoM is computed from $q_b, q_j$ and appears only via dynamics and momentum costs.
 - Therefore, *with respect to CoM handling*, this implementation is **Pattern C**.
 
 ---
@@ -178,8 +178,8 @@ Yes: **arm configuration is fully taken into account in the true centroidal mode
   - any payloads attached to the robot.
 
 - Each arm link contributes:
-  - its mass $$m_i$$,
-  - its own CoM position $$c_i(q)$$,
+  - its mass $m_i$,
+  - its own CoM position $c_i(q)$,
   which depends on joint angles in the arms.
 
 Consequences:
@@ -189,8 +189,8 @@ Consequences:
    - This effect is captured automatically when you compute CoM from the URDF inertias.
 
 2. **Arms therefore influence centroidal dynamics.**
-   - Centroidal momentum $$h_G = A_G(q)\dot q$$ includes contributions from arm velocities.
-   - Changing arm pose changes $$A_G(q)$$, and thus how joint velocities map to momentum.
+   - Centroidal momentum $h_G = A_G(q)\dot q$ includes contributions from arm velocities.
+   - Changing arm pose changes $A_G(q)$, and thus how joint velocities map to momentum.
 
 3. **Patterns A/B/C can all exploit this:**
    - Pattern A: a sophisticated pattern generator *can* plan CoM and arm motion jointly.

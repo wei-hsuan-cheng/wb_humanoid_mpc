@@ -54,6 +54,7 @@ $$
   A_G(q) = \sum_{i=1}^N X_{Gi}^*\,I_i\,J_i(q),
 $$
 where
+
 - $J_i(q)$ is the body Jacobian of link $i$,
 - $I_i$ is the spatial inertia of link $i$,
 - $X_{Gi}^*$ is the **wrench transform** from link frame $i$ to the CoM frame $G$.
@@ -115,8 +116,7 @@ $$
     \dot h_G \\
     \dot q_b \\
     \dot q_j
-  \end{bmatrix}
-  =
+  \end{bmatrix} =
   \begin{bmatrix}
     f_{\text{cent}}(q,\dot q, W_c) \\
     f_{\text{kin,base}}(q,\dot q) \\
