@@ -122,8 +122,7 @@ where $W_c$ are the contact wrenches, and $\dot h_G$ is computed using the true 
 
 ## 4. Tracking: CoM vs. Torso and Limbs
 
-Although the dynamics are expressed around the **true CoM**, tracking tasks in MPC are defined
-as *functions of the state* and can refer to *any* body frame or point:
+Although the dynamics are expressed around the **true CoM**, tracking tasks in MPC are defined as *functions of the state* and can refer to *any* body frame or point:
 
 - **CoM tracking task**:
   $$
@@ -146,10 +145,8 @@ as *functions of the state* and can refer to *any* body frame or point:
 Crucially:
 
 - The **reference frame for momentum** is the CoM.
-- The **reference frames for tracking** (torso, feet, hands) are simply *other functions* of
-  the same state $q$.
-- You do **not** need to “fix” the CoM at the torso to define a consistent reference trajectory.
-  Instead, you:
+- The **reference frames for tracking** (torso, feet, hands) are simply *other functions* of the same state $q$.
+- You do **not** need to “fix” the CoM at the torso to define a consistent reference trajectory. Instead, you:
   - use the true CoM in the centroidal dynamics and in CoM-related costs,
   - use the torso frame and limb frames in their own costs.
 
@@ -167,14 +164,16 @@ Suppose you want to regulate the centroidal momentum to a desired trajectory $h_
   $$
     h_G(q,\dot q) = A_G(q)\,\dot q,
   $$
+  
   with $A_G(q)$ built from the *current* CoM.
+
 - When solving the OCP, the MPC uses this exact mapping at each state $x$.
+  
 - The cost
   $$
     \ell_{h}(x) = \big\| h_G(q,\dot q) - h_G^{\text{des}}(t) \big\|_{W_h}^2
   $$
-  always compares two quantities defined about **the same instantaneous CoM**, so the problem
-  is well-posed.
+  always compares two quantities defined about **the same instantaneous CoM**, so the problem is well-posed.
 
 The fact that $c(q)$ changes over time simply means that $A_G(q)$ and $I_G(q)$ are configuration-dependent, which is exactly what the full centroidal model is designed to capture.
 
@@ -187,14 +186,12 @@ The fact that $c(q)$ changes over time simply means that $A_G(q)$ and $I_G(q)$ a
   - but internal limb motions are misrepresented.
 - In **true centroidal MPC**, the CoM is computed from the URDF’s link inertias at each step:
   - $c(q)$ typically moves a few centimeters around the torso as the robot walks or swings arms,
-  - but the relationship between external wrenches and momentum rate
-    $\dot h_G$ remains physically exact.
+  - but the relationship between external wrenches and momentum rate $\dot h_G$ remains physically exact.
 
 The MPC then:
 
 1. Uses the true CoM in the centroidal dynamics and contact moment arms $(r_c - c(q))$.
 2. Tracks CoM, torso, and limb trajectories via separate cost terms defined on the same state.
-3. Achieves higher model fidelity than SRBD without sacrificing the ability to use torso-based
-   reference trajectories.
+3. Achieves higher model fidelity than SRBD without sacrificing the ability to use torso-based reference trajectories.
 
 This is the intended use of the **true CoM** during centroidal MPC.

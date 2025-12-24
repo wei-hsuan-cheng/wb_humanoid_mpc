@@ -187,14 +187,13 @@ Consequences:
 
 3. **Patterns A/B/C can all exploit this:**
    - Pattern A: a sophisticated pattern generator *can* plan CoM and arm motion jointly.
-   - Pattern B: if your “CoM = torso + offset” approximation ignores arm mass, it becomes less
-     accurate for large arm motions.
-   - Pattern C: arms can be used as an internal degree of freedom to adjust balance (*e.g.*, arm
-     flailing or counter–swing) without a prescribed CoM trajectory.
+   - Pattern B: if your “CoM = torso + offset” approximation ignores arm mass, it becomes less accurate for large arm motions.
+   - Pattern C: arms can be used as an internal degree of freedom to adjust balance (*e.g.*, arm flailing or counter–swing) without a prescribed CoM trajectory.
 
 In summary:
 
 - In a **true centroidal MPC** implementation using the URDF inertias, *all* links—including arms—contribute to CoM and centroidal momentum.
+
 - Arm configurations are not “just for legs”; they are part of the dynamical system that determines CoM, momentum, and feasible GRFs.
 
 ---
