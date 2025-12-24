@@ -27,7 +27,7 @@ where
 
 - $h_{\mathrm{com}} = [v_{\mathrm{com}};\, \ell_{\mathrm{com}}/m] \in \mathbb{R}^6$ is centroidal momentum (linear velocity + angular momentum divided by mass),
 - $q_b \in \mathbb{R}^6$ is the floating-base pose (position + ZYX orientation),
-- $q_j \in \mathbb{R}^{n_a}$ are the actuated joint angles.
+- $q_j \in \mathbb{R}^{n_a}$ are the actuated joint angles (arm + legs).
 
 **Input**
 
