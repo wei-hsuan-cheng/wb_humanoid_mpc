@@ -46,7 +46,7 @@ $$
   \end{bmatrix},
 $$
 
-i.e. 6D left and right foot wrenches plus joint velocities.
+*i.e.*, 6D left and right foot wrenches plus joint velocities.
 
 In code this is reflected by:
 
@@ -201,7 +201,7 @@ $$
 
 This cost discourages GRF patterns that would generate large leg torques according to this approximate mapping.
 
-> Important: this is a **soft cost**, not a hard box constraint. It shapes MPC’s choice of wrenches but does not guarantee hard torque limits.
+> *Important: this is a **soft cost**, not a hard box constraint. It shapes MPC’s choice of wrenches but does not guarantee hard torque limits.*
 
 ---
 
@@ -319,7 +319,7 @@ Inside `computeJointTorques`:
        J_foot_r.transpose() * footWrenches[1];
    ```
 
-   i.e.
+   *i.e.*,
 
    $$
     Q_{\mathrm{ext}} = J_{LF}^\top W_L^* + J_{RF}^\top W_R^*.
@@ -362,7 +362,7 @@ Inside `computeJointTorques`:
        externalForcesInJointSpace.tail(n_joints);
    ```
 
-   i.e.
+   *i.e.*,
 
    $$
     \tau_{\mathrm{joints}} =
@@ -383,7 +383,7 @@ with $\ddot q_{\mathrm{des}} = [\ddot q_{\mathrm{base}};\ddot q_{j,\mathrm{des}}
 
 ---
 
-## 5. Torque approximation in MPC vs actual inverse-dynamics torques
+## 5. Torque approximation in MPC vs. actual inverse-dynamics torques
 
 - At the **MPC level**, `ExternalTorqueQuadraticCostAD` uses a kinematic/dynamic mapping to estimate leg torques $\tau_{\mathrm{ext}}(x,u)$ from the current state and contact wrenches, and penalizes them with a quadratic cost.
 - This **shapes** the GRFs (wrenches $W_L, W_R$) to be more torque-friendly, but is still an approximate, reduced-order model and a *soft* constraint.

@@ -1,10 +1,8 @@
 # Supplementary: Pattern Types for CoM/Torso/Feet Reference Generation
 
-> *This page is the supplement of [humanoid_centroidal_mpc.md](./humanoid_centroidal_mpc.md).*
+> *This page is a supplement of [humanoid_centroidal_mpc.md](./humanoid_centroidal_mpc.md).*
 
-This note classifies three common *pattern types* for how high–level reference trajectories
-(CoM, torso/base, feet) are generated and fed into a **centroidal MPC** or **whole–body MPC**
-stack. It also clarifies that **arm configurations** contribute to the whole–body CoM.
+This note classifies three common *pattern types* for how high–level reference trajectories (CoM, torso/base, feet) are generated and fed into a **centroidal MPC** or **whole–body MPC** stack. It also clarifies that **arm configurations** contribute to the whole–body CoM.
 
 ---
 
@@ -26,8 +24,8 @@ We assume a floating–base robot model with:
   - $q_b$ is the floating–base (torso) pose,
   - $q_j$ are joint angles.
 
-- Contact sequence / gait schedule: stance vs swing phases of feet.
-- A high–level command, e.g. desired torso velocity or pose.
+- Contact sequence / gait schedule: **stance** vs. **swing** phases of feet.
+- A high–level command, *e.g.*, desired torso velocity or pose.
 
 We distinguish *what is generated ahead of time* and fed as **reference trajectories** into MPC:
 
@@ -40,7 +38,7 @@ We distinguish *what is generated ahead of time* and fed as **reference trajecto
 
 ## 2. Pattern A – Full Pattern Generator (CoM + Torso + Feet)
 
-**Idea.**  
+**Idea:**
 A separate high–level **pattern generator** computes *all* of the following:
 
 - CoM trajectory $c_{\text{des}}(t)$ (often via LIPM, SRBD, or linearized centroidal models),
@@ -48,11 +46,9 @@ A separate high–level **pattern generator** computes *all* of the following:
 - swing foot trajectories $r_{\text{foot,des}}(t)$,
 - possibly nominal centroidal momentum $h_G^{\text{des}}(t)$.
 
-The pattern generator uses the **gait schedule** and the motion command (e.g. desired walking
-velocity) to ensure that:
+The pattern generator uses the **gait schedule** and the motion command (*e.g.*, desired walking velocity) to ensure that:
 
-- CoM, torso, and feet are **mutually consistent**, e.g. CoM projection stays inside the support
-  polygon, pelvis follows a smooth path over footsteps, etc.
+- CoM, torso, and feet are **mutually consistent**, *e.g.*, CoM projection stays inside the support polygon, pelvis follows a smooth path over footsteps, etc.
 
 The centroidal MPC then:
 
@@ -74,16 +70,14 @@ The centroidal MPC then:
 **Cons:**
 
 - Requires maintaining a more complex pattern generator.
-- May be less flexible for highly dynamic or unstructured teleoperation, where the operator
-  directly commands base/hand motions.
+- May be less flexible for highly dynamic or unstructured teleoperation, where the operator directly commands base/hand motions.
 
 ---
 
 ## 3. Pattern B – Torso–Driven CoM (CoM as Offset from Torso)
 
-**Idea.**  
-High–level commands (teleop GUI, joystick, etc.) primarily specify **torso/base motion**. The CoM
-trajectory is then generated from the torso reference by a simple kinematic rule, for example:
+**Idea:**  
+High–level commands (teleop GUI, joystick, etc.) primarily specify **torso/base motion**. The CoM trajectory is then generated from the torso reference by a simple kinematic rule, for example:
 
 $$
   c_{\text{des}}(t) = p_{b,\text{des}}(t) + R_{b,\text{des}}(t)\,d_0,
@@ -91,9 +85,7 @@ $$
 
 where $d_0$ is a nominal torso→CoM offset measured from a standard standing pose.
 
-Feet trajectories $r_{\text{foot,des}}(t)$ are generated via a gait module based on the same base
-motion and schedule, but the CoM is not separately planned by a full dynamic model; it is tied to
-the torso with a simple offset.
+Feet trajectories $r_{\text{foot,des}}(t)$ are generated via a gait module based on the same base motion and schedule, but the CoM is not separately planned by a full dynamic model; it is tied to the torso with a simple offset.
 
 The centroidal MPC then:
 
@@ -119,9 +111,8 @@ The centroidal MPC then:
 
 ## 4. Pattern C – Implicit CoM (Torso + Feet Only, CoM Emerges)
 
-**Idea.**  
-The high–level module generates **torso/base** and **foot** references, plus possibly a nominal
-joint posture, but **does not explicitly generate a CoM trajectory**.
+**Idea:**  
+The high–level module generates **torso/base** and **foot** references, plus possibly a nominal joint posture, but **does not explicitly generate a CoM trajectory**.
 
 In this case:
 
@@ -129,7 +120,7 @@ In this case:
   - torso/base tracking,
   - foot/swing tracking,
   - posture regularization,
-  - and **momentum regularization** (e.g. penalizing large $h_G$ or its components),
+  - and **momentum regularization** (*e.g.*, penalizing large $h_G$ or its components),
 - but **no explicit term** of the form $\|c(q) - c_{\text{des}}(t)\|^2$.
 
 The CoM trajectory is then **implicit**:
@@ -164,7 +155,9 @@ The CoM trajectory is then **implicit**:
 
 ## 5. Arms and Their Effect on CoM
 
-Yes: **arm configuration is fully taken into account in the true centroidal model**.
+Question: **Do the arm also contribute the momentums in the centroidal dyanmics?**
+
+Yes: **Arm configuration is fully taken into account in the true centroidal model.**
 
 - The whole–body CoM is defined as
   $$
@@ -196,15 +189,13 @@ Consequences:
    - Pattern A: a sophisticated pattern generator *can* plan CoM and arm motion jointly.
    - Pattern B: if your “CoM = torso + offset” approximation ignores arm mass, it becomes less
      accurate for large arm motions.
-   - Pattern C: arms can be used as an internal degree of freedom to adjust balance (e.g. arm
+   - Pattern C: arms can be used as an internal degree of freedom to adjust balance (*e.g.*, arm
      flailing or counter–swing) without a prescribed CoM trajectory.
 
 In summary:
 
-- In a **true centroidal MPC** implementation using the URDF inertias, *all* links—including arms—
-  contribute to CoM and centroidal momentum.
-- Arm configurations are not “just for legs”; they are part of the dynamical system that determines
-  CoM, momentum, and feasible GRFs.
+- In a **true centroidal MPC** implementation using the URDF inertias, *all* links—including arms—contribute to CoM and centroidal momentum.
+- Arm configurations are not “just for legs”; they are part of the dynamical system that determines CoM, momentum, and feasible GRFs.
 
 ---
 
@@ -225,5 +216,4 @@ In summary:
   - CoM is implicit, shaped by centroidal dynamics and momentum costs,
   - Well–suited to teleoperation and loco–manipulation, where explicit CoM paths are not required.
 
-In all three patterns, **arms** are part of the multi–body model and affect CoM and centroidal
-momentum whenever a *true* centroidal model (based on the URDF inertias) is used.
+In all three patterns, **arms** are part of the multi–body model and affect CoM and centroidal momentum whenever a *true* centroidal model (based on the URDF inertias) is used.

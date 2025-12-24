@@ -1,10 +1,8 @@
 # Supplementary: The Use of the *True* Center of Mass in Centroidal MPC
 
-> *This page is the supplement of [humanoid_centroidal_mpc.md](./humanoid_centroidal_mpc.md).*
+> *This page is a supplement of [humanoid_centroidal_mpc.md](./humanoid_centroidal_mpc.md).*
 
-This section clarifies how the **true whole–body center of mass (CoM)** is used in a centroidal
-Model Predictive Control (MPC) formulation, and how it co–exists with tracking tasks defined
-on the **torso/base frame** and the limbs (feet, hands).
+This section clarifies how the **true whole–body center of mass (CoM)** is used in a centroidal MPC formulation, and how it co–exists with tracking tasks defined on the **torso/base frame** and the limbs (feet, hands).
 
 ---
 
@@ -16,17 +14,16 @@ on the **torso/base frame** and the limbs (feet, hands).
 
 - $\dot q = [\dot q_b; \dot q_j]$: generalized velocities
 
-- $c(q)$: **true whole–body CoM position** in world, computed from all link masses and their
-  current poses.
+- $c(q)$: **true whole–body CoM position** in world, computed from all link masses **(arms, legs, head, etc.)** and their current poses.
 
-- $h_G(q,\dot q) \in \mathbb{R}^6$: **centroidal momentum** about the instantaneous CoM,
-  expressed in a chosen world–aligned frame:
+- $h_G(q,\dot q) \in \mathbb{R}^6$: **centroidal momentum** about the instantaneous CoM, expressed in a chosen world–aligned frame:
   $$
     h_G =
     \begin{bmatrix}
       k_G \\ l_G
     \end{bmatrix},
   $$
+
   with angular momentum $k_G$ and linear momentum $l_G$.
 
 - $A_G(q) \in \mathbb{R}^{6\times(6+n)}$: **centroidal momentum matrix (CMM)**, such that
@@ -81,10 +78,7 @@ $$
 $$
 where $f_c, \tau_c$ are the contact forces and torques applied at contact point $r_c$.
 
-By contrast, the **single rigid body dynamics (SRBD)** approximation places all mass in the
-torso and treats the CoM as fixed in that body. This simplifies the model but no longer matches
-the exact centroidal balance. The full centroidal MPC therefore uses the **true moving CoM** for
-its dynamics.
+By contrast, the **single rigid body dynamics (SRBD)** approximation places all mass in the torso and treats the CoM as fixed in that body. This simplifies the model but no longer matches the exact centroidal balance. The full centroidal MPC therefore uses the **true moving CoM** for its dynamics.
 
 ---
 
@@ -104,9 +98,8 @@ $$
 where:
 
 - $h_G$ is **always** defined about the *current* whole–body CoM.
-- $q_b$ is the torso/base pose (e.g., a link such as `base_link`), not the CoM pose.
-- The CoM position $c(q)$ is **not a separate state variable**; it is a function of $q$ that can
-  be evaluated when needed inside the dynamics, constraints, and costs.
+- $q_b$ is the torso/base pose (*e.g.*, a link such as `base_link`), not the CoM pose.
+- The CoM position $c(q)$ is **not a separate state variable**; it is a function of $q$ that can be evaluated when needed inside the dynamics, constraints, and costs.
 
 The centroidal dynamics used in the MPC are then
 
@@ -123,8 +116,7 @@ $$
     \dot q_j
   \end{bmatrix},
 $$
-where $W_c$ are the contact wrenches, and $\dot h_G$ is computed using the true CoM in the
-moment arm $(r_c - c(q))\times f_c$.
+where $W_c$ are the contact wrenches, and $\dot h_G$ is computed using the true CoM in the moment arm $(r_c - c(q))\times f_c$.
 
 ---
 
@@ -163,15 +155,13 @@ Crucially:
 
 This separation is what is meant by:
 
-> “For tracking, you can still track torso pose, hands, feet, etc. — they’re just separate task variables.”
+> *“For tracking, you can still track torso pose, hands, feet, etc. — they’re just separate task variables.”*
 
 ---
 
 ## 5. Why a Moving CoM Does *Not* Break $h_G$ Tracking
 
-Suppose you want to regulate the centroidal momentum to a desired trajectory
-$h_G^{\text{des}}(t)$. Even though the CoM position $c(q)$ varies with limb motion,
-this does **not** create a conceptual inconsistency:
+Suppose you want to regulate the centroidal momentum to a desired trajectory $h_G^{\text{des}}(t)$. Even though the CoM position $c(q)$ varies with limb motion, this does **not** create a conceptual inconsistency:
 
 - At each time, the definition of centroidal momentum is
   $$
@@ -186,8 +176,7 @@ this does **not** create a conceptual inconsistency:
   always compares two quantities defined about **the same instantaneous CoM**, so the problem
   is well-posed.
 
-The fact that $c(q)$ changes over time simply means that $A_G(q)$ and $I_G(q)$ are
-configuration-dependent, which is exactly what the full centroidal model is designed to capture.
+The fact that $c(q)$ changes over time simply means that $A_G(q)$ and $I_G(q)$ are configuration-dependent, which is exactly what the full centroidal model is designed to capture.
 
 ---
 
