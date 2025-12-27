@@ -1,10 +1,12 @@
-# Humanoid Centroidal MPC → Inner-Loop WBC via Inverse Dynamics
+# Outer-Loop Humanoid Centroidal MPC → Inner-Loop WBC via Whole-Body Inverse Dynamics
 
-This note summarizes how the **centroidal NMPC** in `wb_humanoid_mpc` connects to the **inner loop inverse-dynamics torque controller**, including where torque-related costs influence the ground-reaction forces (GRFs).
+This note summarizes the architecture of the **MPC-WBC** two-layer controller in [`humanoid_centroidal_mpc`](../../humanoid_nmpc/humanoid_centroidal_mpc/).
+The **outer-loop centroidal NMPC** optimizes ground-reaction forces (GRFs) and joint velocities trajectories based on centroidal dynamics + whole-body kinematics **(CD+WBK)**, and then sends them as commnads for the **inner-loop whole-body controller (WBC)** to track. The WBC is a **joint torque controller** realized via **whole-body inverse-dynamics**.
+Note that there are also torque-related costs designed at MPC-level to implicitly influence the ground-reaction forces.
 
 ---
 
-## 1. Centroidal NMPC (outer loop)
+## 1. Centroidal NMPC (outer-loop)
 
 ### 1.1 State and input
 
@@ -159,11 +161,11 @@ Together with friction cones, joint-velocity bounds, etc., these form the NMPC c
 
 ## 2. Torque-related cost in centroidal MPC (GRF shaping)
 
-Centroidal MPC **biases the GRFs** using a torque-related cost.
+Centroidal MPC (implicitly) **biases the GRFs** using a torque-related cost.
 
 ### 2.1 Configuration in task file
 
-In `g1_centroidal_mpc/config/mpc/task.info`:
+In [`g1_centroidal_mpc/config/mpc/task.info`](../../robot_models/unitree_g1/g1_centroidal_mpc/config/mpc/task.info):
 
 ```ini
 left_leg_torque_cost
@@ -180,12 +182,13 @@ left_leg_torque_cost
 
   weights {
     scaling 1e-4
-    (0,0)  2.0
-    (1,0)  2.0
-    (2,0)  1.0
-    (3,0)  8.0
-    (4,0)  0.2
-    (5,0)  0.2
+
+    (0,0)  2.0     ; 
+    (1,0)  2.0     ; 
+    (2,0)  1.0     ; 
+    (3,0)  8.0     ; 
+    (4,0)  0.2     ; 
+    (5,0)  0.2     ; 
   }
 }
 
@@ -194,24 +197,31 @@ right_leg_torque_cost { ... }
 
 ### 2.2 Factory and cost class
 
-In `HumanoidCostConstraintFactory.cpp`:
+In [`HumanoidCostConstraintFactory.cpp`](../../humanoid_nmpc/humanoid_common_mpc/src/HumanoidCostConstraintFactory.cpp):
 
 ```cpp
-auto cost = std::make_unique<ExternalTorqueQuadraticCostAD>(
-    contactPointIndex, config,
-    *referenceManagerPtr_, *pinocchioInterfacePtr_,
-    *mpcRobotModelADPtr_, modelSettings_);
+// Cost is: HumanoidCostConstraintFactory::getExternalTorqueQuadraticCost()
+std::make_unique<ExternalTorqueQuadraticCostAD>(
+  contactPointIndex, config, 
+  *referenceManagerPtr_, *pinocchioInterfacePtr_,
+  *mpcRobotModelADPtr_, modelSettings_);
 ```
 
-`ExternalTorqueQuadraticCostAD`:
+[`ExternalTorqueQuadraticCostAD::costVectorFunction()`](../../humanoid_nmpc/humanoid_common_mpc/src/cost/ExternalTorqueQuadraticCostAD.cpp):
 
-- uses an AD Pinocchio interface and the AD robot model to map $(x,u)$ to an approximate vector of **leg joint torques** due to the contact wrenches,
+- uses an AD Pinocchio interface and the AD robot model to map $(x,u)$ to an approximate vector of **leg joint torques** due to the contact wrenches via Jacobian mapping,
+  $$
+    \tau_{\text{ext}} = J_\text{ee}^\top W_{\text{contact}},
+  $$
+
 - builds a Gauss–Newton quadratic cost of the form
 
-$$
-  \ell_{\mathrm{torque}}(x,u)
-  = \big\| W_\tau^{1/2}\, \tau_{\mathrm{ext}}(x,u) \big\|^2.
-$$
+  $$
+    \ell_{\mathrm{torque}}(x,u)
+    = \big\| W_\tau^{1/2}\, \tau_{\mathrm{ext}}(x,u) \big\|^2,
+  $$
+
+- which are implemented in [`ExternalTorqueQuadraticCostAD.cpp:110-135`](../../humanoid_nmpc/humanoid_common_mpc/src/cost/ExternalTorqueQuadraticCostAD.cpp), and are automatically handled by [`StateInputCostGaussNewtonAd()`](../../humanoid_nmpc/humanoid_common_mpc/src/cost/ExternalTorqueQuadraticCostAD.cpp).
 
 This cost discourages GRF patterns that would generate large leg torques according to this approximate mapping.
 
@@ -226,16 +236,14 @@ $$
   \{x^*(t_k+i\Delta t), u^*(t_k+i\Delta t)\}.
 $$
 
-In `CentroidalMpcMrtJointController.cpp`, we evaluate the policy at the current time and take the first sample:
+In [`CentroidalMpcMrtJointController.cpp`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp), we evaluate the policy at the current time and take the first sample:
 
 ```cpp
-mpcMrtInterface_.evaluatePolicy(t, currentMpcObservation_,
-                                mpcPolicyState, mpcPolicyInput);
+mpcMrtInterface_.evaluatePolicy(t, currentMpcObservation_, mpcPolicyState, mpcPolicyInput);
 
 // Desired joints from MPC
 vector_t mpc_q_j_des  = mpcRobotModelPtr_->getJointAngles(mpcPolicyState);
-vector_t mpc_qd_j_des = mpcRobotModelPtr_->getJointVelocities(
-                            mpcPolicyState, mpcPolicyInput);
+vector_t mpc_qd_j_des = mpcRobotModelPtr_->getJointVelocities(mpcPolicyState, mpcPolicyInput);
 
 // Desired contact wrenches from MPC
 std::array<vector6_t, 2> footWrenches{
@@ -249,30 +257,29 @@ At time $t_k$ you therefore have:
 - joint references $q_{j,\mathrm{des}}^*(t_k)$, $\dot q_{j,\mathrm{des}}^*(t_k)$,
 - contact wrenches $W_L^*(t_k)$, $W_R^*(t_k)$.
 
+> *Caution: original author left a comment in [`CentroidalMpcMrtJointController.cpp:158`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp): `// TODO something seems wrong with the inverse dynamics. You should correct that.`. May need to fix this or tackle it carefully.*
+
 ---
 
-## 4. Inner loop: joint-space PD → full inverse dynamics
+## 4. Inner-loop: joint-space PD → whole-body inverse dynamics
 
 ### 4.1 Joint-space PD to get desired accelerations
 
-Current joint state:
+Current joint state ([`CentroidalMpcMrtJointController.cpp:161-162`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp)):
 
 ```cpp
-vector_t q_j  = mpcRobotModelPtr_->getJointAngles(currentMpcObservation_.state);
-vector_t qd_j = mpcRobotModelPtr_->getJointVelocities(
-                    currentMpcObservation_.state,
-                    currentMpcObservation_.input);
+vector_t q_j = mpcRobotModelPtr_->getJointAngles(currentMpcObservation_.state);
+vector_t qd_j = mpcRobotModelPtr_->getJointVelocities(currentMpcObservation_.state, currentMpcObservation_.input);
 ```
 
-Desired joint acceleration:
+Desired joint acceleration ([`CentroidalMpcMrtJointController.cpp:163`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp)):
 
 ```cpp
-vector_t qdd_j_des =
-    inverse_dynamics_kp_ * (mpc_q_j_des  - q_j) +
-    inverse_dynamics_kd_ * (mpc_qd_j_des - qd_j);
+vector_t qdd_j_des = inverse_dynamics_kp_ * (mpc_q_j_des - q_j) +
+                     inverse_dynamics_kd_ * (mpc_qd_j_des - qd_j);
 ```
 
-Mathematically:
+Mathematically it is
 
 $$
   \ddot q_{j,\mathrm{des}} =
@@ -288,28 +295,24 @@ $$
   e = q_j - q_{j,\mathrm{des}}^*.
 $$
 
-### 4.2 Full-body inverse dynamics (Pinocchio)
+### 4.2 Whole-body inverse dynamics (Pinocchio)
 
-We also fetch the full generalized coordinates and velocities:
-
-```cpp
-vector_t q  = mpcRobotModelPtr_->getGeneralizedCoordinates(currentMpcObservation_.state);
-vector_t qd = mpcRobotModelPtr_->getGeneralizedVelocities(
-                  currentMpcObservation_.state,
-                  currentMpcObservation_.input);
-```
-
-Then call:
+We also fetch the full generalized coordinates and velocities ([`CentroidalMpcMrtJointController.cpp:168-169`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp)):
 
 ```cpp
-vector_t mpcJointTorques =
-    computeJointTorques<scalar_t>(q, qd, qdd_j_des,
-                                  footWrenches, pinocchioInterface_);
+vector_t q = mpcRobotModelPtr_->getGeneralizedCoordinates(currentMpcObservation_.state);
+vector_t qd = mpcRobotModelPtr_->getGeneralizedVelocities(currentMpcObservation_.state, currentMpcObservation_.input);
 ```
 
-Inside `computeJointTorques`:
+Then call ([`CentroidalMpcMrtJointController.cpp:175`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp)):
 
-1. **Mass matrix and nonlinear effects** via CRBA + RNEA-style calls:
+```cpp
+vector_t mpcJointTorques = computeJointTorques<scalar_t>(q, qd, qdd_j_des, footWrenches, pinocchioInterface_);
+```
+
+Inside [`computeJointTorques()`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp):
+
+1. **Mass matrix and nonlinear effects** via CRBA + RNEA-style calls ([`DynamicsHelperFunctions.cpp:241-242`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp)):
 
    ```cpp
    pinocchio::crba(model, data, q);              // M(q)
@@ -318,14 +321,14 @@ Inside `computeJointTorques`:
 
    giving $M(q)$ and $h(q,\dot q)$.
 
-2. **Foot Jacobians**:
+2. **Foot Jacobians** ([`DynamicsHelperFunctions.cpp:250-253`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp)):
 
    ```cpp
    computeFrameJacobian(..., "left_foot_l_contact",  J_foot_l);
    computeFrameJacobian(..., "right_foot_r_contact", J_foot_r);
    ```
 
-3. **Generalized external forces** from MPC wrenches:
+3. **Generalized external forces** from MPC wrenches ([`DynamicsHelperFunctions.cpp:257`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp)):
 
    ```cpp
    VECTOR_T externalForcesInJointSpace =
@@ -339,7 +342,7 @@ Inside `computeJointTorques`:
     Q_{\mathrm{ext}} = J_{LF}^\top W_L^* + J_{RF}^\top W_R^*.
    $$
 
-4. **Generalized acceleration**:
+4. **Generalized acceleration** ([`DynamicsHelperFunctions.cpp:261-262`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp)):
 
    A helper computes the floating-base acceleration; then:
 
@@ -358,7 +361,7 @@ Inside `computeJointTorques`:
     \end{bmatrix}.
    $$
 
-5. **Joint torques** from rigid-body dynamics:
+5. **Joint torques** from rigid-body dynamics ([`DynamicsHelperFunctions.cpp:263-265`](../../humanoid_nmpc/humanoid_common_mpc/src/pinocchio_model/DynamicsHelperFunctions.cpp)):
 
    The floating-base dynamics are
 
@@ -386,61 +389,61 @@ Inside `computeJointTorques`:
     Q_{\mathrm{ext},j}.
    $$
 
-So the inner loop realizes the mapping
+So the inner-loop realizes the mapping
 
 $$
   \tau =
   M(q)\ddot q_{\mathrm{des}} + h(q,\dot q) - J_c^\top W_c^*,
 $$
 
-with $\ddot q_{\mathrm{des}} = [\ddot q_{\mathrm{base}};\ddot q_{j,\mathrm{des}}]$ and $W_c^*$ from centroidal MPC.
+with $\ddot q_{\mathrm{des}} = [\ddot q_{\mathrm{base}};\ddot q_{j,\mathrm{des}}]$ and $W_c^* = [W_L^*;W_R^*]$ from the outer-loop centroidal MPC.
 
 ---
 
 ## 5. Torque approximation in MPC vs. actual inverse-dynamics torques
 
-- At the **MPC level**, `ExternalTorqueQuadraticCostAD` uses a kinematic/dynamic mapping to estimate leg torques $\tau_{\mathrm{ext}}(x,u)$ from the current state and contact wrenches, and penalizes them with a quadratic cost.
+- At the **MPC-level**, [`ExternalTorqueQuadraticCostAD`](../../humanoid_nmpc/humanoid_common_mpc/src/cost/ExternalTorqueQuadraticCostAD.cpp) uses a Jacobian mapping to estimate leg torques $\tau_{\mathrm{ext}}(x,u)$ from the current state and contact wrenches, and penalizes them with a quadratic cost.
 - This **shapes** the GRFs (wrenches $W_L, W_R$) to be more torque-friendly, but is still an approximate, reduced-order model and a *soft* constraint.
 
-- At the **inverse-dynamics level**, `computeJointTorques` uses the full floating-base rigid-body dynamics
+- At the **inverse-dynamics level**, [`computeJointTorques()`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/mrt/CentroidalMpcMrtJointController.cpp) uses the full floating-base (whole-body) rigid-body dynamics
 
   $$
     M(q)\ddot q + h(q,\dot q) = S^\top \tau + J_c^\top W_c^*
   $$
 
-  to compute actual torques $\tau$. These can differ from the torques implied by the MPC cost, and can exceed hardware limits if not further constrained.
+  to compute actual torques $\tau$. These can **differ** from the torques implied by the MPC cost, and can exceed hardware limits if not further constrained.
 
 In practice:
 
 - MPC torque cost = guidance to keep GRFs in a torque-feasible region.
 - Hard torque limits must still be enforced in:
-  - a QP-style whole-body controller with box constraints on $\tau$, or
+  - a QP-style whole-body controller **(QP-WBC)** with box constraints on $\tau$, or
   - the hardware driver (saturation / current limits).
 
 ---
 
 ## 6. Overall pipeline
 
-1. **Centroidal NMPC**
-   - State $x = (h_{\mathrm{com}}, q_b, q_j)$
-   - Input $u = (W_L, W_R, \dot q_j)$
-   - Dynamics: centroidal + kinematics
+1. **Centroidal NMPC (outer-loop)**
+   - State: $x = (h_{\mathrm{com}}, q_b, q_j)$
+   - Input: $u = (W_L, W_R, \dot q_j)$
+   - System dynamics: centroidal dynamics + whole-body kinematics (CD+WBK)
    - Constraints: stance/swing kinematics, friction cones, joint-vel bounds
-   - Costs: tracking (CoM/base/feet), wrench regularization, **torque-related cost** via `ExternalTorqueQuadraticCostAD`
+   - Costs: tracking (CoM/base/feet), wrench regularization, **torque-related cost** via [`ExternalTorqueQuadraticCostAD`](../../humanoid_nmpc/humanoid_common_mpc/src/cost/ExternalTorqueQuadraticCostAD.cpp)
 
 2. **MPC output at $t_k$**
    - Joint references $q_{j,\mathrm{des}}^*, \dot q_{j,\mathrm{des}}^*$
    - Contact wrenches $W_L^*, W_R^*$
 
-3. **Inner loop**
+3. **WBC via inverse dynamics (inner-loop)**
    - Joint-space PD → $\ddot q_{j,\mathrm{des}}$
-   - Full inverse dynamics (CRBA + nonLinearEffects + $J_c^\top W_c^*$) → joint torques $\tau$
+   - Whole-body inverse dynamics (CRBA + nonLinearEffects + $J_c^\top W_c^*$) → joint torques $\tau$
 
 4. **Execution**
    - Send $\tau$ to hardware / low-level controller
    - Optionally add QP torque constraints or saturation for strict safety.
 
-This is the implementation path for **humanoid centroidal MPC → inner-loop inverse dynamics** in `wb_humanoid_mpc`, including how torque costs in MPC influence GRFs and how actual torques are computed in the inner loop.
+This is the implementation path for **MPC-WBC** in [`humanoid_centroidal_mpc`](../../humanoid_nmpc/humanoid_centroidal_mpc/), including how torque costs in MPC influence GRFs and how actual torques are computed in the inner-loop.
 
 ---
 
