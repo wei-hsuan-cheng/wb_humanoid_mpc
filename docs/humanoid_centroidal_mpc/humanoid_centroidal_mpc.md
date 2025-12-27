@@ -8,7 +8,7 @@ This note summarizes how the **centroidal NMPC** in `wb_humanoid_mpc` connects t
 
 ### 1.1 State and input
 
-Defined in `CentroidalMpcRobotModel.h`.
+Defined in [`CentroidalMpcRobotModel.h:54`](../../humanoid_nmpc/humanoid_centroidal_mpc/include/humanoid_centroidal_mpc/common/CentroidalMpcRobotModel.h).
 
 **State**
 
@@ -35,7 +35,7 @@ There are 2 contacts, each with a 6D wrench:
 
 - $W_i = [f_i;\, \tau_i] \in \mathbb{R}^6$, force $f_i$ and torque $\tau_i$ at foot $i$.
 
-The input is
+The (kino-dynamic) input is
 
 $$
   u =
@@ -77,6 +77,7 @@ where
 - $c$ is CoM position,
 - $r_i$ is the contact position of foot $i$,
 - $W_i = [f_i;\, \tau_i]$ comes directly from the MPC input.
+- Defined in [`CentroidalDynamicsAD::computeFlowMap()`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/dynamics/CentroidalDynamicsAD.cpp).
 
 The relationship between centroidal momentum and generalized velocities is
 
@@ -102,6 +103,11 @@ $$
 
 (with $v_j$ taken from the input).
 
+- Defined in functions
+  - `PinocchioCentroidalDynamics::getValue()` in [`PinocchioCentroidalDynamics.cpp`](../../lib/ocs2_ros2/ocs2_pinocchio/ocs2_centroidal_model/src/PinocchioCentroidalDynamics.cpp), and
+  - `PinocchioCentroidalDynamicsAD::getValue()` in [`PinocchioCentroidalDynamicsAD.cpp`](../../lib/ocs2_ros2/ocs2_pinocchio/ocs2_centroidal_model/src/PinocchioCentroidalDynamicsAD.cpp),
+  - which built the normalized centroidal momentum rate and joint velocities and then send to [`CentroidalDynamicsAD::computeFlowMap()`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/dynamics/CentroidalDynamicsAD.cpp) as the control input.
+
 These relations define
 
 $$
@@ -111,12 +117,6 @@ $$
 used by OCS2.
 
 ### 1.3 Contact and swing-foot constraints
-
-Implemented via:
-
-- `ZeroVelocityConstraintCppAd` + `EndEffectorKinematicsTwistConstraint` for **stance** feet
-- `NormalVelocityConstraintCppAd` + `EndEffectorKinematicsLinearVelConstraint` for **swing** feet
-- `SwingTrajectoryPlanner` and `HumanoidPreComputation` to configure them.
 
 **Stance feet**: pose wrt ground and twist must satisfy
 
@@ -140,6 +140,20 @@ $$
 with $n$ the ground normal.
 
 Together with friction cones, joint-velocity bounds, etc., these form the NMPC constraints.
+
+**Code implementions:**
+
+- **Stance** feet (zero twist/orientation fixed):
+  - [`ZeroVelocityConstraintCppAd + EndEffectorKinematicsTwistConstraint`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/constraint/ZeroVelocityConstraintCppAd.cpp) for stance feet.
+  - This wraps [`EndEffectorKinematicsTwistConstraint`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/constraint/ZeroVelocityConstraintCppAd.cpp), updates the ground-height offset via [`HumanoidPreComputation`](../../humanoid_nmpc/humanoid_common_mpc/src/HumanoidPreComputation.cpp), and is active when the **contact** flag is **true**.
+
+- **Swing** feet (normal velocity follows planner profile):
+  - [`NormalVelocityConstraintCppAd + EndEffectorKinematicsLinearVelConstraint`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/constraint/NormalVelocityConstraintCppAd.cpp) for **swing** feet.
+  - This wraps [`EndEffectorKinematicsLinearVelConstraint`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/constraint/NormalVelocityConstraintCppAd.cpp) with a 1D normal-velocity config from [`HumanoidPreComputation`](../../humanoid_nmpc/humanoid_common_mpc/src/HumanoidPreComputation.cpp), and is active when the **contact** flag is **false**.
+
+- Configuration/planning:
+  - Swing profiles and constraint configs are prepared in [`HumanoidPreComputation`](../../humanoid_nmpc/humanoid_common_mpc/src/HumanoidPreComputation.cpp) and [`SwingTrajectoryPlanner`](../../humanoid_nmpc/humanoid_common_mpc/src/swing_foot_planner/SwingTrajectoryPlanner.cpp). These feed the normal-velocity constraints for swing feet.
+  - The constraints are wired into the problem in [`CentroidalMpcInterface.cpp:212-213`](../../humanoid_nmpc/humanoid_centroidal_mpc/src/CentroidalMpcInterface.cpp) (`getStanceFootConstraint()` and `getNormalVelocityConstraint`).
 
 ---
 
